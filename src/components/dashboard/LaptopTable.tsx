@@ -107,11 +107,11 @@ export const LaptopTable = () => {
               <TableRow>
                 <SortableHeader field="brand">Brand</SortableHeader>
                 <SortableHeader field="model">Model</SortableHeader>
+                <SortableHeader field="cpuModel">CPU Model</SortableHeader>
                 <SortableHeader field="batteryHealth">Battery</SortableHeader>
                 <SortableHeader field="cpuTemp">CPU Temp</SortableHeader>
-                <SortableHeader field="ramUsage">RAM Usage</SortableHeader>
+                <SortableHeader field="ssdHealth">SSD Health</SortableHeader>
                 <SortableHeader field="status">Status</SortableHeader>
-                <SortableHeader field="price">Price</SortableHeader>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -119,16 +119,15 @@ export const LaptopTable = () => {
                 <TableRow key={laptop.id} className="hover:bg-muted/50">
                   <TableCell className="font-medium">{laptop.brand}</TableCell>
                   <TableCell>{laptop.model}</TableCell>
+                  <TableCell className="text-sm">{laptop.cpuModel}</TableCell>
                   <TableCell>
-                    <div className="flex items-center gap-2">
-                      <span className={cn(
-                        'font-medium',
-                        laptop.batteryHealth >= 80 ? 'text-success' :
-                        laptop.batteryHealth >= 60 ? 'text-warning' : 'text-danger'
-                      )}>
-                        {laptop.batteryHealth}%
-                      </span>
-                    </div>
+                    <span className={cn(
+                      'font-medium',
+                      laptop.batteryHealth >= 80 ? 'text-success' :
+                      laptop.batteryHealth >= 60 ? 'text-warning' : 'text-danger'
+                    )}>
+                      {laptop.batteryHealth}%
+                    </span>
                   </TableCell>
                   <TableCell>
                     <span className={cn(
@@ -140,20 +139,18 @@ export const LaptopTable = () => {
                     </span>
                   </TableCell>
                   <TableCell>
-                    <span className="text-sm">
-                      {laptop.ramUsage}GB / {laptop.totalRam}GB
+                    <span className={cn(
+                      'font-medium',
+                      laptop.ssdHealth >= 90 ? 'text-success' :
+                      laptop.ssdHealth >= 80 ? 'text-warning' : 'text-danger'
+                    )}>
+                      {laptop.ssdHealth}%
                     </span>
-                    <div className="text-xs text-muted-foreground">
-                      ({Math.round((laptop.ramUsage / laptop.totalRam) * 100)}%)
-                    </div>
                   </TableCell>
                   <TableCell>
                     <Badge variant={getStatusBadgeVariant(laptop.status)}>
                       {laptop.status}
                     </Badge>
-                  </TableCell>
-                  <TableCell className="font-medium">
-                    ${laptop.price.toLocaleString()}
                   </TableCell>
                 </TableRow>
               ))}

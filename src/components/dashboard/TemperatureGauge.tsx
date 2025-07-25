@@ -6,7 +6,7 @@ export const TemperatureGauge = () => {
   const tempData = laptopData.map((laptop, index) => ({
     name: laptop.brand,
     cpuTemp: laptop.cpuTemp,
-    gpuTemp: laptop.gpuTemp || 0,
+    fanSpeed: Math.round(laptop.fanSpeed / 1000), // Convert to thousands for display
     index: index + 1
   })).sort((a, b) => a.cpuTemp - b.cpuTemp);
 
@@ -68,11 +68,11 @@ export const TemperatureGauge = () => {
             />
             <Area
               type="monotone"
-              dataKey="gpuTemp"
-              stroke="hsl(var(--danger))"
+              dataKey="fanSpeed"
+              stroke="hsl(var(--primary))"
               fillOpacity={1}
               fill="url(#gpuGradient)"
-              name="GPU Temperature"
+              name="Fan Speed (x1000 RPM)"
               strokeWidth={2}
             />
           </AreaChart>
