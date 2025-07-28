@@ -10,8 +10,9 @@ interface MetricCardProps {
     value: number;
     isPositive: boolean;
   };
+  description?: string;
   className?: string;
-  variant?: 'default' | 'gradient' | 'primary' | 'accent';
+  variant?: 'default' | 'gradient' | 'primary' | 'accent' | 'warning' | 'destructive';
 }
 
 export const MetricCard = ({ 
@@ -19,6 +20,7 @@ export const MetricCard = ({
   value, 
   icon, 
   trend, 
+  description,
   className,
   variant = 'default' 
 }: MetricCardProps) => {
@@ -30,6 +32,10 @@ export const MetricCard = ({
         return 'bg-primary text-primary-foreground border-none';
       case 'accent':
         return 'bg-accent text-accent-foreground border-none';
+      case 'warning':
+        return 'bg-warning text-warning-foreground border-none';
+      case 'destructive':
+        return 'bg-destructive text-destructive-foreground border-none';
       default:
         return 'bg-card border-border hover:shadow-card transition-all duration-200';
     }
@@ -53,6 +59,14 @@ export const MetricCard = ({
             <p className="text-3xl font-bold tracking-tight">
               {value}
             </p>
+            {description && (
+              <p className={cn(
+                "text-xs",
+                variant === 'default' ? 'text-muted-foreground' : 'text-current opacity-70'
+              )}>
+                {description}
+              </p>
+            )}
             {trend && (
               <div className="flex items-center gap-1 text-xs">
                 <span className={cn(

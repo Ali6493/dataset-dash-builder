@@ -1,191 +1,93 @@
-export interface LaptopData {
+export interface DeviceData {
   id: string;
-  brand: string;
-  model: string;
+  deviceManufacturer: string;
+  deviceProductVersion: string;
   cpuModel: string;
-  cpuTemp: number;
-  batteryHealth: number;
-  ramUsage: number;
   totalRam: number;
-  ssdHealth: number;
-  gpuModel: string;
-  fanSpeed: number;
-  os: string;
-  uptime: number;
-  screenBrightness: number;
+  graphicalCards: string;
+  numberOfGraphicalCards: number;
+  graphicalCardRam: number;
+  batteryDesignedCapacity: number;
+  batteryFullChargeCapacity: number;
+  batteryHealth: number;
+  estimatedBatteryLife: number;
+  cpuEnergyConsumption: number;
+  diskEnergyConsumption: number;
+  displayEnergyConsumption: number;
+  networkEnergyConsumption: number;
+  totalCO2Emitted: number;
+  totalEnergyConsumption: number;
+  acAdapterWatt: number;
   status: 'excellent' | 'good' | 'warning' | 'critical';
 }
 
-export const laptopData: LaptopData[] = [
+// Sample data based on your provided dataset
+export const sampleDeviceData: DeviceData[] = [
   {
     id: "1",
-    brand: "Dell",
-    model: "XPS 13",
-    cpuModel: "Intel i7-1165G7",
-    cpuTemp: 52,
-    batteryHealth: 91,
-    ramUsage: 7.2,
-    totalRam: 16,
-    ssdHealth: 95,
-    gpuModel: "Intel Iris Xe",
-    fanSpeed: 3200,
-    os: "Windows 11",
-    uptime: 4.2,
-    screenBrightness: 70,
-    status: "excellent"
+    deviceManufacturer: "Lenovo",
+    deviceProductVersion: "ThinkPad E15",
+    cpuModel: "Intel Core i7-10510U CPU @ 1.80GHz",
+    totalRam: 8,
+    graphicalCards: "AMD Radeon RX 640 (2GB), Intel UHD Graphics (1GB)",
+    numberOfGraphicalCards: 2,
+    graphicalCardRam: 2,
+    batteryDesignedCapacity: 45730,
+    batteryFullChargeCapacity: 39220,
+    batteryHealth: 85.764,
+    estimatedBatteryLife: 5.084444444,
+    cpuEnergyConsumption: 18.0714,
+    diskEnergyConsumption: 3.41363,
+    displayEnergyConsumption: 6.70163,
+    networkEnergyConsumption: 1.02949,
+    totalCO2Emitted: 0.0120892,
+    totalEnergyConsumption: 36.6339,
+    acAdapterWatt: 0,
+    status: "good"
   },
   {
     id: "2",
-    brand: "HP",
-    model: "Spectre x360",
-    cpuModel: "Intel i5-1235U",
-    cpuTemp: 61,
-    batteryHealth: 87,
-    ramUsage: 5.8,
-    totalRam: 8,
-    ssdHealth: 89,
-    gpuModel: "Intel Iris Xe",
-    fanSpeed: 2900,
-    os: "Windows 11",
-    uptime: 3.5,
-    screenBrightness: 80,
-    status: "good"
+    deviceManufacturer: "Lenovo",
+    deviceProductVersion: "ThinkPad T14s Gen 2i",
+    cpuModel: "11th Gen Intel Core i7-1165G7 @ 2.80GHz",
+    totalRam: 16,
+    graphicalCards: "Intel Xe Graphics (128MB)",
+    numberOfGraphicalCards: 1,
+    graphicalCardRam: 0.125,
+    batteryDesignedCapacity: 57000,
+    batteryFullChargeCapacity: 56970,
+    batteryHealth: 99.947,
+    estimatedBatteryLife: 6.983055556,
+    cpuEnergyConsumption: 0.355766,
+    diskEnergyConsumption: 0.0934945,
+    displayEnergyConsumption: 2.33075,
+    networkEnergyConsumption: 0,
+    totalCO2Emitted: 0.00234404,
+    totalEnergyConsumption: 7.10314,
+    acAdapterWatt: 0,
+    status: "excellent"
   },
   {
     id: "3",
-    brand: "Lenovo",
-    model: "ThinkPad X1",
-    cpuModel: "Intel i7-1260P",
-    cpuTemp: 47,
-    batteryHealth: 96,
-    ramUsage: 10.5,
-    totalRam: 16,
-    ssdHealth: 98,
-    gpuModel: "Intel Iris Xe",
-    fanSpeed: 3100,
-    os: "Windows 10",
-    uptime: 7.8,
-    screenBrightness: 60,
-    status: "excellent"
-  },
-  {
-    id: "4",
-    brand: "ASUS",
-    model: "ROG Zephyrus",
-    cpuModel: "AMD Ryzen 9 6900HS",
-    cpuTemp: 72,
-    batteryHealth: 78,
-    ramUsage: 15.3,
-    totalRam: 32,
-    ssdHealth: 93,
-    gpuModel: "NVIDIA RTX 3060",
-    fanSpeed: 4800,
-    os: "Windows 11",
-    uptime: 1.2,
-    screenBrightness: 100,
+    deviceManufacturer: "Lenovo",
+    deviceProductVersion: "ThinkPad X1 Carbon 3rd",
+    cpuModel: "Intel Core i7-5500U CPU @ 2.40GHz",
+    totalRam: 8,
+    graphicalCards: "Intel HD Graphics 5500 (1GB)",
+    numberOfGraphicalCards: 1,
+    graphicalCardRam: 1,
+    batteryDesignedCapacity: 50080,
+    batteryFullChargeCapacity: 35680,
+    batteryHealth: 71.246,
+    estimatedBatteryLife: 5.574444444,
+    cpuEnergyConsumption: 12.9833,
+    diskEnergyConsumption: 0.56493,
+    displayEnergyConsumption: 6.35517,
+    networkEnergyConsumption: 0.166254,
+    totalCO2Emitted: 0.0066389,
+    totalEnergyConsumption: 20.1179,
+    acAdapterWatt: 0,
     status: "warning"
-  },
-  {
-    id: "5",
-    brand: "Apple",
-    model: "MacBook Air M2",
-    cpuModel: "Apple M2",
-    cpuTemp: 44,
-    batteryHealth: 99,
-    ramUsage: 5.1,
-    totalRam: 8,
-    ssdHealth: 100,
-    gpuModel: "Integrated M2 GPU",
-    fanSpeed: 2200,
-    os: "macOS 14",
-    uptime: 10,
-    screenBrightness: 65,
-    status: "excellent"
-  },
-  {
-    id: "6",
-    brand: "Acer",
-    model: "Swift 3",
-    cpuModel: "Intel i5-1135G7",
-    cpuTemp: 58,
-    batteryHealth: 85,
-    ramUsage: 6.7,
-    totalRam: 8,
-    ssdHealth: 91,
-    gpuModel: "Intel Iris Xe",
-    fanSpeed: 2500,
-    os: "Windows 11",
-    uptime: 5,
-    screenBrightness: 75,
-    status: "good"
-  },
-  {
-    id: "7",
-    brand: "Razer",
-    model: "Blade 15",
-    cpuModel: "Intel i7-12700H",
-    cpuTemp: 68,
-    batteryHealth: 82,
-    ramUsage: 19.6,
-    totalRam: 32,
-    ssdHealth: 89,
-    gpuModel: "NVIDIA RTX 3070 Ti",
-    fanSpeed: 5200,
-    os: "Windows 11",
-    uptime: 2.5,
-    screenBrightness: 90,
-    status: "good"
-  },
-  {
-    id: "8",
-    brand: "MSI",
-    model: "Creator Z16",
-    cpuModel: "Intel i9-12900H",
-    cpuTemp: 74,
-    batteryHealth: 76,
-    ramUsage: 25,
-    totalRam: 32,
-    ssdHealth: 87,
-    gpuModel: "NVIDIA RTX 3060",
-    fanSpeed: 5500,
-    os: "Windows 11",
-    uptime: 1,
-    screenBrightness: 85,
-    status: "warning"
-  },
-  {
-    id: "9",
-    brand: "Microsoft",
-    model: "Surface Laptop",
-    cpuModel: "Intel i5-1145G7",
-    cpuTemp: 51,
-    batteryHealth: 93,
-    ramUsage: 4.3,
-    totalRam: 8,
-    ssdHealth: 97,
-    gpuModel: "Intel Iris Xe",
-    fanSpeed: 2600,
-    os: "Windows 11",
-    uptime: 6.4,
-    screenBrightness: 68,
-    status: "excellent"
-  },
-  {
-    id: "10",
-    brand: "LG",
-    model: "Gram 17",
-    cpuModel: "Intel i7-1165G7",
-    cpuTemp: 46,
-    batteryHealth: 92,
-    ramUsage: 6.2,
-    totalRam: 16,
-    ssdHealth: 94,
-    gpuModel: "Intel Iris Xe",
-    fanSpeed: 2800,
-    os: "Windows 11",
-    uptime: 8.6,
-    screenBrightness: 72,
-    status: "excellent"
   }
 ];
 
@@ -199,36 +101,65 @@ export const getStatusColor = (status: string) => {
   }
 };
 
-export const getBrandStats = () => {
-  const brandCount = laptopData.reduce((acc, laptop) => {
-    acc[laptop.brand] = (acc[laptop.brand] || 0) + 1;
+export const getDeviceStatus = (device: DeviceData): 'excellent' | 'good' | 'warning' | 'critical' => {
+  if (device.batteryHealth >= 90 && device.totalEnergyConsumption <= 20) return 'excellent';
+  if (device.batteryHealth >= 70 && device.totalEnergyConsumption <= 40) return 'good';
+  if (device.batteryHealth >= 50 && device.totalEnergyConsumption <= 60) return 'warning';
+  return 'critical';
+};
+
+export const getManufacturerStats = (data: DeviceData[]) => {
+  const manufacturerCount = data.reduce((acc, device) => {
+    acc[device.deviceManufacturer] = (acc[device.deviceManufacturer] || 0) + 1;
     return acc;
   }, {} as Record<string, number>);
   
-  return Object.entries(brandCount).map(([brand, count]) => ({
-    brand,
+  return Object.entries(manufacturerCount).map(([manufacturer, count]) => ({
+    manufacturer,
     count,
-    percentage: Math.round((count / laptopData.length) * 100)
+    percentage: Math.round((count / data.length) * 100)
   }));
 };
 
-export const getPerformanceMetrics = () => {
-  const totalLaptops = laptopData.length;
+export const getPerformanceMetrics = (data: DeviceData[]) => {
+  const totalDevices = data.length;
+  if (totalDevices === 0) return {
+    totalDevices: 0,
+    avgBatteryHealth: 0,
+    avgCO2Emission: 0,
+    avgEnergyConsumption: 0,
+    criticalCount: 0,
+    excellentCount: 0,
+    healthyPercentage: 0
+  };
+
   const avgBatteryHealth = Math.round(
-    laptopData.reduce((sum, laptop) => sum + laptop.batteryHealth, 0) / totalLaptops
+    data.reduce((sum, device) => sum + device.batteryHealth, 0) / totalDevices
   );
-  const avgCpuTemp = Math.round(
-    laptopData.reduce((sum, laptop) => sum + laptop.cpuTemp, 0) / totalLaptops
+  const avgCO2Emission = Number(
+    (data.reduce((sum, device) => sum + device.totalCO2Emitted, 0) / totalDevices).toFixed(6)
   );
-  const criticalCount = laptopData.filter(laptop => laptop.status === 'critical').length;
-  const excellentCount = laptopData.filter(laptop => laptop.status === 'excellent').length;
+  const avgEnergyConsumption = Number(
+    (data.reduce((sum, device) => sum + device.totalEnergyConsumption, 0) / totalDevices).toFixed(2)
+  );
+  
+  // Calculate status for each device
+  const devicesWithStatus = data.map(device => ({
+    ...device,
+    status: getDeviceStatus(device)
+  }));
+  
+  const criticalCount = devicesWithStatus.filter(device => device.status === 'critical').length;
+  const excellentCount = devicesWithStatus.filter(device => device.status === 'excellent').length;
+  const goodCount = devicesWithStatus.filter(device => device.status === 'good').length;
 
   return {
-    totalLaptops,
+    totalDevices,
     avgBatteryHealth,
-    avgCpuTemp,
+    avgCO2Emission,
+    avgEnergyConsumption,
     criticalCount,
     excellentCount,
-    healthyPercentage: Math.round(((excellentCount + laptopData.filter(l => l.status === 'good').length) / totalLaptops) * 100)
+    healthyPercentage: Math.round(((excellentCount + goodCount) / totalDevices) * 100)
   };
 };

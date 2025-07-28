@@ -1,151 +1,158 @@
+import { useState } from 'react';
 import { 
-  Laptop, 
+  Monitor, 
   Battery, 
-  Thermometer, 
-  HardDrive, 
-  AlertTriangle,
+  Leaf, 
+  AlertTriangle, 
   TrendingUp,
-  Activity,
-  Cpu
+  Zap,
+  Server,
+  Factory
 } from 'lucide-react';
 import { MetricCard } from './MetricCard';
 import { PerformanceChart } from './PerformanceChart';
 import { BrandDistribution } from './BrandDistribution';
-import { LaptopTable } from './LaptopTable';
-import { TemperatureGauge } from './TemperatureGauge';
+import { DeviceTable } from './DeviceTable';
+import { EnergyAnalysis } from './EnergyAnalysis';
+import { ExcelUploader } from './ExcelUploader';
 import { getPerformanceMetrics } from '@/data/laptopData';
+import { DeviceData, sampleDeviceData } from '@/data/laptopData';
 
 export const Dashboard = () => {
-  const metrics = getPerformanceMetrics();
+  const [deviceData, setDeviceData] = useState<DeviceData[]>(sampleDeviceData);
+  const [isLoading, setIsLoading] = useState(false);
+  
+  const metrics = getPerformanceMetrics(deviceData);
+
+  const handleDataLoaded = (data: DeviceData[]) => {
+    setIsLoading(true);
+    // Simulate processing time
+    setTimeout(() => {
+      setDeviceData(data);
+      setIsLoading(false);
+    }, 1000);
+  };
 
   return (
-    <div className="min-h-screen bg-background p-6">
-      <div className="max-w-7xl mx-auto space-y-6">
+    <div className="min-h-screen bg-background">
+      <div className="container mx-auto p-6 space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-4xl font-bold tracking-tight bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-              Laptop Dashboard
-            </h1>
+            <h1 className="text-4xl font-bold text-foreground">Device Energy & Performance Dashboard</h1>
             <p className="text-muted-foreground mt-2">
-              Monitor and manage your laptop fleet performance
+              Monitor device energy consumption, CO2 emissions, and performance metrics
             </p>
           </div>
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Activity className="h-4 w-4" />
-            <span>Last updated: {new Date().toLocaleTimeString()}</span>
+          <div className="flex items-center gap-4">
+            <div className="text-right">
+              <p className="text-sm text-muted-foreground">Last Updated</p>
+              <p className="font-medium">{new Date().toLocaleString()}</p>
+            </div>
           </div>
         </div>
 
-        {/* Metrics Cards */}
+        {/* Excel Upload */}
+        <ExcelUploader onDataLoaded={handleDataLoaded} isLoading={isLoading} />
+
+        {/* Key Metrics */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <MetricCard
-            title="Total Laptops"
-            value={metrics.totalLaptops}
-            icon={<Laptop className="h-6 w-6" />}
-            trend={{ value: 12, isPositive: true }}
-            variant="gradient"
+            title="Total Devices"
+            value={metrics.totalDevices.toString()}
+            icon={<Monitor className="h-6 w-6" />}
+            description="Connected devices"
           />
           <MetricCard
             title="Avg Battery Health"
             value={`${metrics.avgBatteryHealth}%`}
             icon={<Battery className="h-6 w-6" />}
-            trend={{ value: 3, isPositive: true }}
-            variant="primary"
+            description="Fleet average"
           />
           <MetricCard
-            title="Avg CPU Temperature"
-            value={`${metrics.avgCpuTemp}°C`}
-            icon={<Thermometer className="h-6 w-6" />}
-            trend={{ value: 2, isPositive: false }}
-            variant="accent"
+            title="Avg CO2 Emission"
+            value={`${metrics.avgCO2Emission} kg`}
+            icon={<Leaf className="h-6 w-6" />}
+            description="Carbon footprint"
+            variant="warning"
           />
           <MetricCard
-            title="Critical Alerts"
-            value={metrics.criticalCount}
-            icon={<AlertTriangle className="h-6 w-6" />}
-            className={metrics.criticalCount > 0 ? "border-danger" : ""}
+            title="Avg Energy Usage"
+            value={`${metrics.avgEnergyConsumption} Wh`}
+            icon={<Zap className="h-6 w-6" />}
+            description="Power consumption"
           />
         </div>
 
-        {/* Performance Metrics Row */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <MetricCard
-            title="Healthy Systems"
-            value={`${metrics.healthyPercentage}%`}
-            icon={<TrendingUp className="h-6 w-6" />}
-            trend={{ value: 8, isPositive: true }}
-          />
-          <MetricCard
-            title="Excellent Condition"
-            value={metrics.excellentCount}
-            icon={<Cpu className="h-6 w-6" />}
-            trend={{ value: 15, isPositive: true }}
-          />
-          <MetricCard
-            title="Total Value"
-            value={`$${(metrics.totalLaptops * 1599).toLocaleString()}`}
-            icon={<HardDrive className="h-6 w-6" />}
-            trend={{ value: 5, isPositive: true }}
-          />
-        </div>
-
-        {/* Charts Row */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <PerformanceChart />
-          <BrandDistribution />
-        </div>
-
-        {/* Temperature Analysis */}
+        {/* Performance Overview */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <TemperatureGauge />
-          <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="p-6 bg-gradient-to-br from-success/10 to-success/5 border border-success/20 rounded-lg">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-success/10 rounded-lg">
-                    <Battery className="h-5 w-5 text-success" />
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">Best Battery</p>
-                    <p className="font-bold text-success">MacBook Pro - 98%</p>
-                  </div>
-                </div>
-              </div>
-              <div className="p-6 bg-gradient-to-br from-danger/10 to-danger/5 border border-danger/20 rounded-lg">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-danger/10 rounded-lg">
-                    <Thermometer className="h-5 w-5 text-danger" />
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">Hottest CPU</p>
-                    <p className="font-bold text-danger">Acer Predator - 85°C</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="p-6 bg-gradient-to-br from-warning/10 to-warning/5 border border-warning/20 rounded-lg">
-              <h3 className="font-semibold mb-3 text-warning">Maintenance Alerts</h3>
-              <div className="space-y-2 text-sm">
-                <div className="flex justify-between">
-                  <span>Acer Predator Helios</span>
-                  <span className="text-danger font-medium">Critical - Service Required</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Microsoft Surface Laptop</span>
-                  <span className="text-warning font-medium">Low Battery Health</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Lenovo ThinkPad X1</span>
-                  <span className="text-warning font-medium">High Temperature</span>
-                </div>
+          <div>
+            <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2">
+              <TrendingUp className="h-6 w-6" />
+              Performance Trends
+            </h2>
+            <PerformanceChart data={deviceData} />
+          </div>
+          <div>
+            <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2">
+              <Factory className="h-6 w-6" />
+              Manufacturer Distribution
+            </h2>
+            <BrandDistribution data={deviceData} />
+          </div>
+        </div>
+
+        {/* Detailed Analysis */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div>
+            <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2">
+              <Zap className="h-6 w-6" />
+              Energy Consumption Analysis
+            </h2>
+            <EnergyAnalysis data={deviceData} />
+          </div>
+          <div className="space-y-6">
+            <div>
+              <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2">
+                <Server className="h-6 w-6" />
+                Fleet Health Overview
+              </h2>
+              <div className="grid grid-cols-2 gap-4">
+                <MetricCard
+                  title="Healthy Systems"
+                  value={`${metrics.healthyPercentage}%`}
+                  icon={<TrendingUp className="h-5 w-5" />}
+                  description="Good or excellent"
+                />
+                <MetricCard
+                  title="Critical Alerts"
+                  value={metrics.criticalCount.toString()}
+                  icon={<AlertTriangle className="h-5 w-5" />}
+                  description="Require attention"
+                  variant="destructive"
+                />
+                <MetricCard
+                  title="Excellent Devices"
+                  value={metrics.excellentCount.toString()}
+                  icon={<Battery className="h-5 w-5" />}
+                  description="Top performers"
+                />
+                <MetricCard
+                  title="Total Energy"
+                  value={`${deviceData.reduce((sum, d) => sum + d.totalEnergyConsumption, 0).toFixed(1)} Wh`}
+                  icon={<Zap className="h-5 w-5" />}
+                  description="Fleet consumption"
+                />
               </div>
             </div>
           </div>
         </div>
 
-        {/* Data Table */}
-        <LaptopTable />
+        {/* Detailed Table */}
+        <div>
+          <h2 className="text-2xl font-semibold mb-4">Device Inventory</h2>
+          <DeviceTable data={deviceData} />
+        </div>
       </div>
     </div>
   );

@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip, Legend } from 'recharts';
-import { getBrandStats } from '@/data/laptopData';
+import { getManufacturerStats, DeviceData } from '@/data/laptopData';
 
 const COLORS = [
   'hsl(var(--primary))',
@@ -13,17 +13,21 @@ const COLORS = [
   'hsl(var(--danger))'
 ];
 
-export const BrandDistribution = () => {
-  const brandStats = getBrandStats();
+interface BrandDistributionProps {
+  data: DeviceData[];
+}
+
+export const BrandDistribution = ({ data }: BrandDistributionProps) => {
+  const manufacturerStats = getManufacturerStats(data);
 
   const CustomTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
       return (
         <div className="bg-card border border-border rounded-lg p-3 shadow-lg">
-          <p className="font-medium text-card-foreground">{data.brand}</p>
+          <p className="font-medium text-card-foreground">{data.manufacturer}</p>
           <p className="text-sm text-muted-foreground">
-            {data.count} laptops ({data.percentage}%)
+            {data.count} devices ({data.percentage}%)
           </p>
         </div>
       );
@@ -57,13 +61,13 @@ export const BrandDistribution = () => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Brand Distribution</CardTitle>
+        <CardTitle>Manufacturer Distribution</CardTitle>
       </CardHeader>
       <CardContent>
         <ResponsiveContainer width="100%" height={300}>
           <PieChart>
             <Pie
-              data={brandStats}
+              data={manufacturerStats}
               cx="50%"
               cy="50%"
               labelLine={false}
@@ -72,7 +76,7 @@ export const BrandDistribution = () => {
               fill="#8884d8"
               dataKey="count"
             >
-              {brandStats.map((entry, index) => (
+              {manufacturerStats.map((entry, index) => (
                 <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
               ))}
             </Pie>

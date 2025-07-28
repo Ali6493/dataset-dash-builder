@@ -1,13 +1,18 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
-import { laptopData } from '@/data/laptopData';
+import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
+import { DeviceData } from '@/data/laptopData';
 
-export const PerformanceChart = () => {
-  const chartData = laptopData.map(laptop => ({
-    name: `${laptop.brand} ${laptop.model.split(' ')[0]}`,
-    batteryHealth: laptop.batteryHealth,
-    cpuTemp: laptop.cpuTemp,
-    ramUsage: Math.round((laptop.ramUsage / laptop.totalRam) * 100)
+interface PerformanceChartProps {
+  data: DeviceData[];
+}
+
+export const PerformanceChart = ({ data }: PerformanceChartProps) => {
+  const chartData = data.map((device, index) => ({
+    name: `${device.deviceManufacturer} ${index + 1}`,
+    batteryHealth: device.batteryHealth,
+    energyConsumption: device.totalEnergyConsumption,
+    co2Emission: device.totalCO2Emitted * 1000, // Convert to grams
+    batteryLife: device.estimatedBatteryLife
   }));
 
   const CustomTooltip = ({ active, payload, label }: any) => {
@@ -17,10 +22,11 @@ export const PerformanceChart = () => {
           <p className="font-medium text-card-foreground mb-2">{label}</p>
           {payload.map((entry: any, index: number) => (
             <p key={index} className="text-sm" style={{ color: entry.color }}>
-              {entry.name}: {entry.value}
-              {entry.dataKey === 'cpuTemp' ? '°C' : 
-               entry.dataKey === 'ramUsage' ? '%' : 
-               entry.dataKey === 'batteryHealth' ? '%' : ''}
+              {entry.name}: {entry.value.toFixed(2)}
+              {entry.dataKey === 'batteryHealth' ? '%' : 
+               entry.dataKey === 'energyConsumption' ? ' Wh' : 
+               entry.dataKey === 'co2Emission' ? ' g' :
+               entry.dataKey === 'batteryLife' ? ' hrs' : ''}
             </p>
           ))}
         </div>
@@ -36,7 +42,7 @@ export const PerformanceChart = () => {
       </CardHeader>
       <CardContent>
         <ResponsiveContainer width="100%" height={300}>
-          <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+          <LineChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
             <XAxis 
               dataKey="name" 
@@ -48,25 +54,35 @@ export const PerformanceChart = () => {
             <YAxis tick={{ fontSize: 12, fill: 'hsl(var(--muted-foreground))' }} />
             <Tooltip content={<CustomTooltip />} />
             <Legend />
-            <Bar 
-              dataKey="batteryHealth" 
-              name="Battery Health" 
-              fill="hsl(var(--success))" 
-              radius={[2, 2, 0, 0]}
+            <Line
+              type="monotone"
+              dataKey="batteryHealth"
+              stroke="hsl(var(--success))"
+              strokeWidth={2}
+              name="Battery Health (%)"
             />
-            <Bar 
-              dataKey="cpuTemp" 
-              name="CPU Temp" 
-              fill="hsl(var(--warning))" 
-              radius={[2, 2, 0, 0]}
+            <Line
+              type="monotone"
+              dataKey="energyConsumption"
+              stroke="hsl(var(--warning))"
+              strokeWidth={2}
+              name="Energy Consumption (Wh)"
             />
-            <Bar 
-              dataKey="ramUsage" 
-              name="RAM Usage" 
-              fill="hsl(var(--primary))" 
-              radius={[2, 2, 0, 0]}
+            <Line
+              type="monotone"
+              dataKey="co2Emission"
+              stroke="hsl(var(--danger))"
+              strokeWidth={2}
+              name="CO2 Emission (g)"
             />
-          </BarChart>
+            <Line
+              type="monotone"
+              dataKey="batteryLife"
+              stroke="hsl(var(--primary))"
+              strokeWidth={2}
+              name="Battery Life (hrs)"
+            />
+          </LineChart>
         </ResponsiveContainer>
       </CardContent>
     </Card>
