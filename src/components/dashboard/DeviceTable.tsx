@@ -132,18 +132,21 @@ export const DeviceTable = ({ data }: DeviceTableProps) => {
                 return (
                   <TableRow key={device.id} className="hover:bg-muted/50">
                     <TableCell>{device.deviceManufacturer}</TableCell>
-                    <TableCell>{device.deviceProductVersion}</TableCell>
-                    <TableCell>{device.cpuModel}</TableCell>
+                    <TableCell className="max-w-[180px] truncate whitespace-nowrap">{device.deviceProductVersion}</TableCell>
+                    <TableCell className="max-w-[200px] truncate whitespace-nowrap">{device.cpuModel}</TableCell>
                     <TableCell>{device.totalRam}</TableCell>
                     <TableCell>{device.graphicalCards}</TableCell>
                     <TableCell>{device.numberOfGraphicalCards}</TableCell>
                     <TableCell>{device.graphicalCardRam}</TableCell>
                     <TableCell>{device.batteryDesignedCapacity}</TableCell>
                     <TableCell>{device.batteryFullChargeCapacity}</TableCell>
-                    <TableCell>!isNaN(Number(device.batteryHealth))
-  ? Number(device.batteryHealth).toFixed(1) + '%'
-  : 'N/A'
-</TableCell>
+                    <TableCell>{
+                      typeof device.batteryHealth === 'number'
+                        ? device.batteryHealth.toFixed(1) + '%'
+                        : typeof device.batteryHealth === 'string' && device.batteryHealth.trim().endsWith('%')
+                          ? device.batteryHealth
+                          : 'N/A'
+                    }</TableCell>
                     <TableCell>{device.estimatedBatteryLife}</TableCell>
                     <TableCell>{device.cpuEnergyConsumption}</TableCell>
                     <TableCell>{device.diskEnergyConsumption}</TableCell>
