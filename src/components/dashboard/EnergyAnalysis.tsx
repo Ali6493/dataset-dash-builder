@@ -8,7 +8,11 @@ interface EnergyAnalysisProps {
 
 export const EnergyAnalysis = ({ data }: EnergyAnalysisProps) => {
   const energyData = data.map((device, index) => ({
-    name: `${device.deviceManufacturer} ${device.deviceProductVersion.split(' ')[0]}`,
+name: `${device.deviceManufacturer} ${
+  typeof device.deviceProductVersion === 'string'
+    ? device.deviceProductVersion.split(' ')[0]
+    : String(device.deviceProductVersion ?? 'Unknown')
+}`,
     cpuEnergy: device.cpuEnergyConsumption,
     diskEnergy: device.diskEnergyConsumption,
     displayEnergy: device.displayEnergyConsumption,
