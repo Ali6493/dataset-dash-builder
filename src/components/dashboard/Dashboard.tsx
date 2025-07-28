@@ -14,24 +14,14 @@ import { PerformanceChart } from './PerformanceChart';
 import { BrandDistribution } from './BrandDistribution';
 import { DeviceTable } from './DeviceTable';
 import { EnergyAnalysis } from './EnergyAnalysis';
-import { ExcelUploader } from './ExcelUploader';
 import { getPerformanceMetrics } from '@/data/laptopData';
 import { DeviceData, sampleDeviceData } from '@/data/laptopData';
 
 export const Dashboard = () => {
   const [deviceData, setDeviceData] = useState<DeviceData[]>(sampleDeviceData);
-  const [isLoading, setIsLoading] = useState(false);
   
   const metrics = getPerformanceMetrics(deviceData);
 
-  const handleDataLoaded = (data: DeviceData[]) => {
-    setIsLoading(true);
-    // Simulate processing time
-    setTimeout(() => {
-      setDeviceData(data);
-      setIsLoading(false);
-    }, 1000);
-  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -52,8 +42,6 @@ export const Dashboard = () => {
           </div>
         </div>
 
-        {/* Excel Upload */}
-        <ExcelUploader onDataLoaded={handleDataLoaded} isLoading={isLoading} />
 
         {/* Key Metrics */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
