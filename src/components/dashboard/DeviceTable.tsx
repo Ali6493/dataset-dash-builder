@@ -141,7 +141,9 @@ export const DeviceTable = ({ data }: DeviceTableProps) => {
                         device.totalEnergyConsumption <= 20 ? 'text-success' :
                         device.totalEnergyConsumption <= 40 ? 'text-warning' : 'text-danger'
                       )}>
-                        {device.totalEnergyConsumption.toFixed(1)}
+                            {typeof device.batteryHealth === 'number' 
+                              ? device.batteryHealth.toFixed(2) + '%' 
+                              : 'N/A'}
                       </span>
                     </TableCell>
                     <TableCell>
