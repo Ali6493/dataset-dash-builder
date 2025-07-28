@@ -18,6 +18,7 @@ import {
   SelectTrigger,
   SelectContent,
   SelectItem,
+  SelectValue,
 } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -28,8 +29,8 @@ interface DeviceTableProps {
 }
 
 export const DeviceTable = ({ data }: DeviceTableProps) => {
-  const [manufacturer, setManufacturer] = useState('');
-  const [cpuModel, setCpuModel] = useState('');
+  const [manufacturer, setManufacturer] = useState('all');
+  const [cpuModel, setCpuModel] = useState('all');
   const [ram, setRam] = useState('');
   const [gpu, setGpu] = useState('');
   const [batteryHealthMin, setBatteryHealthMin] = useState('');
@@ -42,8 +43,8 @@ export const DeviceTable = ({ data }: DeviceTableProps) => {
     return data.filter((device) => {
       const status = getDeviceStatus(device);
       return (
-        (manufacturer ? device.deviceManufacturer === manufacturer : true) &&
-        (cpuModel ? device.cpuModel === cpuModel : true) &&
+        (manufacturer !== 'all' ? device.deviceManufacturer === manufacturer : true) &&
+        (cpuModel !== 'all' ? device.cpuModel === cpuModel : true) &&
         (ram ? device.totalRam === Number(ram) : true) &&
         (gpu ? device.graphicalCards === gpu : true) &&
         (batteryHealthMin ? device.batteryHealth >= Number(batteryHealthMin) : true) &&
@@ -68,21 +69,25 @@ export const DeviceTable = ({ data }: DeviceTableProps) => {
       <CardHeader>
         <CardTitle>Device Inventory</CardTitle>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mt-4">
-          <Select onValueChange={setManufacturer} value={manufacturer}>
-            <SelectTrigger>Manufacturer</SelectTrigger>
+          <Select value={manufacturer} onValueChange={setManufacturer}>
+            <SelectTrigger>
+              <SelectValue placeholder="Manufacturer" />
+            </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All</SelectItem>
-              {unique('deviceManufacturer').map((m) => (
+              <SelectItem value="all">All</SelectItem>
+              {unique('deviceManufacturer').filter(Boolean).map((m) => (
                 <SelectItem key={m} value={m}>{m}</SelectItem>
               ))}
             </SelectContent>
           </Select>
 
-          <Select onValueChange={setCpuModel} value={cpuModel}>
-            <SelectTrigger>CPU Model</SelectTrigger>
+          <Select value={cpuModel} onValueChange={setCpuModel}>
+            <SelectTrigger>
+              <SelectValue placeholder="CPU Model" />
+            </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All</SelectItem>
-              {unique('cpuModel').map((c) => (
+              <SelectItem value="all">All</SelectItem>
+              {unique('cpuModel').filter(Boolean).map((c) => (
                 <SelectItem key={c} value={c}>{c}</SelectItem>
               ))}
             </SelectContent>
