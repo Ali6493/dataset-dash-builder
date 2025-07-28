@@ -15,19 +15,23 @@ export const BrandDistribution = ({ data }: BrandDistributionProps) => {
 ])
   ];
 
-  const options = {
-    sankey: {
-      node: {
-        label: { fontSize: 14, bold: true, color: "#333" },
-        width: 20,
-        nodePadding: 20
-      },
-      link: {
-        colorMode: "gradient",
-        colors: ["#6366f1", "#3b82f6", "#06b6d4"]
-      }
+const options = {
+  tooltip: {
+    isHtml: true,
+    trigger: 'focus'
+  },
+  sankey: {
+    node: {
+      label: { fontSize: 14, bold: true, color: "#333" },
+      width: 20,
+      nodePadding: 20
+    },
+    link: {
+      colorMode: "gradient",
+      colors: ["#6366f1", "#3b82f6", "#06b6d4"]
     }
-  };
+  }
+};
 
   return (
     <Card>
