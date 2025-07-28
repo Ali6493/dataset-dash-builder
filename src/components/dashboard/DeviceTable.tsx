@@ -140,7 +140,10 @@ export const DeviceTable = ({ data }: DeviceTableProps) => {
                     <TableCell>{device.graphicalCardRam}</TableCell>
                     <TableCell>{device.batteryDesignedCapacity}</TableCell>
                     <TableCell>{device.batteryFullChargeCapacity}</TableCell>
-                    <TableCell>{device.batteryHealth?.toFixed(1)}%</TableCell>
+                    <TableCell>!isNaN(Number(device.batteryHealth))
+  ? Number(device.batteryHealth).toFixed(1) + '%'
+  : 'N/A'
+</TableCell>
                     <TableCell>{device.estimatedBatteryLife}</TableCell>
                     <TableCell>{device.cpuEnergyConsumption}</TableCell>
                     <TableCell>{device.diskEnergyConsumption}</TableCell>
