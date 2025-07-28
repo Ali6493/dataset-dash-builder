@@ -3,15 +3,15 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from '@/components/ui/table';
-import { Search, Filter, ArrowUpDown } from 'lucide-react';
+import { Search, Filter, ArrowUpDown, ChevronDown, ChevronUp } from 'lucide-react';
 import { DeviceData, getDeviceStatus } from '@/data/laptopData';
 import { cn } from '@/lib/utils';
 
@@ -26,18 +26,19 @@ export const DeviceTable = ({ data }: DeviceTableProps) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [sortField, setSortField] = useState<SortField>('deviceManufacturer');
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
+  const [collapsed, setCollapsed] = useState(false);
 
-  const filteredData = data.filter(device => 
-    device.deviceManufacturer.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    device.deviceProductVersion.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    device.cpuModel.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredData = data.filter(device =>
+    `${device.deviceManufacturer} ${device.deviceProductVersion} ${device.cpuModel}`
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase())
   );
 
   const sortedData = [...filteredData].sort((a, b) => {
     const aValue = a[sortField];
     const bValue = b[sortField];
     if (typeof aValue === 'string' && typeof bValue === 'string') {
-      return sortDirection === 'asc' 
+      return sortDirection === 'asc'
         ? aValue.localeCompare(bValue)
         : bValue.localeCompare(aValue);
     }
@@ -83,7 +84,7 @@ export const DeviceTable = ({ data }: DeviceTableProps) => {
     <Card className="col-span-3">
       <CardHeader>
         <div className="flex items-center justify-between">
-          <CardTitle>Device Inventory</CardTitle>
+          <CardTitle className="text-lg">Device Inventory</CardTitle>
           <div className="flex items-center gap-2">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -98,82 +99,82 @@ export const DeviceTable = ({ data }: DeviceTableProps) => {
               <Filter className="h-4 w-4 mr-2" />
               Filter
             </Button>
+            <Button variant="ghost" size="sm" onClick={() => setCollapsed(!collapsed)}>
+              {collapsed ? <ChevronDown className="w-4 h-4" /> : <ChevronUp className="w-4 h-4" />}
+            </Button>
           </div>
         </div>
       </CardHeader>
-      <CardContent>
-        <div className="rounded-md border overflow-x-auto">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <SortableHeader field="deviceManufacturer">Manufacturer</SortableHeader>
-                <SortableHeader field="deviceProductVersion">Model</SortableHeader>
-                <SortableHeader field="cpuModel">CPU Model</SortableHeader>
-                <SortableHeader field="totalRam">RAM (GB)</SortableHeader>
-                <TableHead>GPU</TableHead>
-                <TableHead># GPUs</TableHead>
-                <TableHead>GPU RAM</TableHead>
-                <TableHead>Battery Designed</TableHead>
-                <TableHead>Battery Full</TableHead>
-                <SortableHeader field="batteryHealth">Battery Health</SortableHeader>
-                <TableHead>Battery Life</TableHead>
-                <TableHead>CPU Energy</TableHead>
-                <TableHead>Disk Energy</TableHead>
-                <TableHead>Display Energy</TableHead>
-                <TableHead>Network Energy</TableHead>
-                <SortableHeader field="totalEnergyConsumption">Total Energy</SortableHeader>
-                <SortableHeader field="totalCO2Emitted">CO2</SortableHeader>
-                <TableHead>Status</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {sortedData.map((device) => {
-                const status = getDeviceStatus(device);
-                return (
-                  <TableRow key={device.id} className="hover:bg-muted/50">
-                    <TableCell>{device.deviceManufacturer}</TableCell>
-                    <TableCell className="max-w-[180px] truncate whitespace-nowrap">{device.deviceProductVersion}</TableCell>
-                    <TableCell className="max-w-[200px] truncate whitespace-nowrap">{device.cpuModel}</TableCell>
-                    <TableCell>{device.totalRam}</TableCell>
-                    <TableCell>{device.graphicalCards}</TableCell>
-                    <TableCell>{device.numberOfGraphicalCards}</TableCell>
-                    <TableCell>{device.graphicalCardRam}</TableCell>
-                    <TableCell>{device.batteryDesignedCapacity}</TableCell>
-                    <TableCell>{device.batteryFullChargeCapacity}</TableCell>
-                    <TableCell>{
-                      typeof device.batteryHealth === 'number'
-                        ? device.batteryHealth.toFixed(1) + '%'
-                        : typeof device.batteryHealth === 'string' && device.batteryHealth.trim().endsWith('%')
-                          ? device.batteryHealth
-                          : 'N/A'
-                    }</TableCell>
-                    <TableCell>{device.estimatedBatteryLife}</TableCell>
-                    <TableCell>{device.cpuEnergyConsumption}</TableCell>
-                    <TableCell>{device.diskEnergyConsumption}</TableCell>
-                    <TableCell>{device.displayEnergyConsumption}</TableCell>
-                    <TableCell>{device.networkEnergyConsumption}</TableCell>
-                    <TableCell>{device.totalEnergyConsumption}</TableCell>
-                    <TableCell>{device.totalCO2Emitted.toFixed(6)}</TableCell>
-                    <TableCell>
-                      <Badge variant={getStatusBadgeVariant(status)}>
-                        {status}
-                      </Badge>
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
-        </div>
-        <div className="flex items-center justify-between mt-4 text-sm text-muted-foreground">
-          <span>
-            Showing {sortedData.length} of {data.length} devices
-          </span>
-          <span>
-            {sortedData.filter(d => getDeviceStatus(d) === 'critical').length} critical alerts
-          </span>
-        </div>
-      </CardContent>
+
+      {!collapsed && (
+        <CardContent>
+          <div className="rounded-md border overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <SortableHeader field="deviceManufacturer">Manufacturer</SortableHeader>
+                  <SortableHeader field="deviceProductVersion">Model</SortableHeader>
+                  <SortableHeader field="cpuModel">CPU Model</SortableHeader>
+                  <SortableHeader field="totalRam">RAM (GB)</SortableHeader>
+                  <TableHead>GPU</TableHead>
+                  <TableHead># GPUs</TableHead>
+                  <TableHead>GPU RAM</TableHead>
+                  <TableHead>Battery Designed</TableHead>
+                  <TableHead>Battery Full</TableHead>
+                  <SortableHeader field="batteryHealth">Battery Health</SortableHeader>
+                  <TableHead>Battery Life</TableHead>
+                  <TableHead>CPU Energy</TableHead>
+                  <TableHead>Disk Energy</TableHead>
+                  <TableHead>Display Energy</TableHead>
+                  <TableHead>Network Energy</TableHead>
+                  <SortableHeader field="totalEnergyConsumption">Total Energy</SortableHeader>
+                  <SortableHeader field="totalCO2Emitted">CO2</SortableHeader>
+                  <TableHead>Status</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {sortedData.map((device) => {
+                  const status = getDeviceStatus(device);
+                  return (
+                    <TableRow key={device.id} className="hover:bg-muted/50">
+                      <TableCell>{device.deviceManufacturer}</TableCell>
+                      <TableCell className="max-w-[180px] truncate">{device.deviceProductVersion}</TableCell>
+                      <TableCell className="max-w-[200px] truncate">{device.cpuModel}</TableCell>
+                      <TableCell>{device.totalRam}</TableCell>
+                      <TableCell>{device.graphicalCards}</TableCell>
+                      <TableCell>{device.numberOfGraphicalCards}</TableCell>
+                      <TableCell>{device.graphicalCardRam}</TableCell>
+                      <TableCell>{device.batteryDesignedCapacity}</TableCell>
+                      <TableCell>{device.batteryFullChargeCapacity}</TableCell>
+                      <TableCell>
+                        {typeof device.batteryHealth === 'number'
+                          ? device.batteryHealth.toFixed(1) + '%'
+                          : typeof device.batteryHealth === 'string' && device.batteryHealth.trim().endsWith('%')
+                            ? device.batteryHealth
+                            : 'N/A'}
+                      </TableCell>
+                      <TableCell>{device.estimatedBatteryLife}</TableCell>
+                      <TableCell>{device.cpuEnergyConsumption}</TableCell>
+                      <TableCell>{device.diskEnergyConsumption}</TableCell>
+                      <TableCell>{device.displayEnergyConsumption}</TableCell>
+                      <TableCell>{device.networkEnergyConsumption}</TableCell>
+                      <TableCell>{device.totalEnergyConsumption}</TableCell>
+                      <TableCell>{device.totalCO2Emitted.toFixed(6)}</TableCell>
+                      <TableCell>
+                        <Badge variant={getStatusBadgeVariant(status)}>{status}</Badge>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </div>
+          <div className="flex items-center justify-between mt-4 text-sm text-muted-foreground">
+            <span>Showing {sortedData.length} of {data.length} devices</span>
+            <span>{sortedData.filter(d => getDeviceStatus(d) === 'critical').length} critical alerts</span>
+          </div>
+        </CardContent>
+      )}
     </Card>
   );
 };
