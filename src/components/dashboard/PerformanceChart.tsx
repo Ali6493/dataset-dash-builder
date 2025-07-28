@@ -39,9 +39,11 @@ export const PerformanceChart = ({ data }: PerformanceChartProps) => {
     batteryLife: average(metrics.batteryLife)
   }));
 
-  function average(arr: number[]): number {
-    return arr.length ? arr.reduce((a, b) => a + b, 0) / arr.length : 0;
-  }
+function average(arr: number[]): number {
+  const valid = arr.filter(v => typeof v === 'number' && !isNaN(v));
+  return valid.length ? valid.reduce((a, b) => a + b, 0) / valid.length : 0;
+}
+
 
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
