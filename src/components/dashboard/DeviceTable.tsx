@@ -26,7 +26,7 @@ export const DeviceTable = ({ data }: DeviceTableProps) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [sortField, setSortField] = useState<SortField>('deviceManufacturer');
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(true);
 
   const filteredData = data.filter(device =>
     `${device.deviceManufacturer} ${device.deviceProductVersion} ${device.cpuModel}`
