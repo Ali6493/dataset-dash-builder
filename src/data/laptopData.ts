@@ -60556,11 +60556,18 @@ export const getStatusColor = (status: string) => {
 };
 
 export const getDeviceStatus = (device: DeviceData): 'excellent' | 'good' | 'warning' | 'critical' => {
-  if (device.batteryHealth >= 90 && device.totalEnergyConsumption <= 20) return 'excellent';
-  if (device.batteryHealth >= 70 && device.totalEnergyConsumption <= 40) return 'good';
-  if (device.batteryHealth >= 50 && device.totalEnergyConsumption <= 60) return 'warning';
+  const battery = typeof device.batteryHealth === 'string'
+    ? parseFloat(device.batteryHealth.replace('%', ''))
+    : device.batteryHealth ?? 0;
+
+  const energy = device.totalEnergyConsumption ?? 100;
+
+  if (battery >= 90 && energy <= 20) return 'excellent';
+  if (battery >= 70 && energy <= 40) return 'good';
+  if (battery >= 50 && energy <= 60) return 'warning';
   return 'critical';
 };
+
 
 export const getManufacturerStats = (data: DeviceData[]) => {
   if (!data || data.length === 0) return [];
