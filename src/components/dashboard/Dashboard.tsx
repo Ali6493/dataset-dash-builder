@@ -97,7 +97,7 @@ export const Dashboard = () => {
               <Zap className="h-6 w-6" />
               Energy Consumption Analysis
             </h2>
-            <EnergyAnalysis data={deviceData} />
+            <EnergyBarChart data={deviceData} />
           </div>
           <div className="space-y-6">
             <div>
