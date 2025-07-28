@@ -109,6 +109,8 @@ export const getDeviceStatus = (device: DeviceData): 'excellent' | 'good' | 'war
 };
 
 export const getManufacturerStats = (data: DeviceData[]) => {
+  if (!data || data.length === 0) return [];
+  
   const manufacturerCount = data.reduce((acc, device) => {
     acc[device.deviceManufacturer] = (acc[device.deviceManufacturer] || 0) + 1;
     return acc;
@@ -122,8 +124,7 @@ export const getManufacturerStats = (data: DeviceData[]) => {
 };
 
 export const getPerformanceMetrics = (data: DeviceData[]) => {
-  const totalDevices = data.length;
-  if (totalDevices === 0) return {
+  if (!data || data.length === 0) return {
     totalDevices: 0,
     avgBatteryHealth: 0,
     avgCO2Emission: 0,
@@ -133,14 +134,15 @@ export const getPerformanceMetrics = (data: DeviceData[]) => {
     healthyPercentage: 0
   };
 
+  const totalDevices = data.length;
   const avgBatteryHealth = Math.round(
-    data.reduce((sum, device) => sum + device.batteryHealth, 0) / totalDevices
+    data.reduce((sum, device) => sum + (device?.batteryHealth || 0), 0) / totalDevices
   );
   const avgCO2Emission = Number(
-    (data.reduce((sum, device) => sum + device.totalCO2Emitted, 0) / totalDevices).toFixed(6)
+    (data.reduce((sum, device) => sum + (device?.totalCO2Emitted || 0), 0) / totalDevices).toFixed(6)
   );
   const avgEnergyConsumption = Number(
-    (data.reduce((sum, device) => sum + device.totalEnergyConsumption, 0) / totalDevices).toFixed(2)
+    (data.reduce((sum, device) => sum + (device?.totalEnergyConsumption || 0), 0) / totalDevices).toFixed(2)
   );
   
   // Calculate status for each device

@@ -29,7 +29,7 @@ export const ExcelUploader = ({ onDataLoaded, isLoading }: ExcelUploaderProps) =
         const jsonData = XLSX.utils.sheet_to_json(worksheet);
 
         // Map Excel columns to our DeviceData interface
-        const deviceData: DeviceData[] = jsonData.map((row: any, index) => ({
+        const deviceData: DeviceData[] = (jsonData || []).map((row: any, index) => ({
           id: String(index + 1),
           deviceManufacturer: row['Device manufacturer'] || '',
           deviceProductVersion: row['Device product version'] || '',
@@ -107,31 +107,17 @@ export const ExcelUploader = ({ onDataLoaded, isLoading }: ExcelUploaderProps) =
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <FileSpreadsheet className="h-5 w-5" />
-          Upload Excel File
+          Select Excel File
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div
-          className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
-            isDragOver ? 'border-primary bg-primary/5' : 'border-muted-foreground/25'
-          }`}
-          onDragOver={handleDragOver}
-          onDragLeave={handleDragLeave}
-          onDrop={handleDrop}
-        >
-          <Upload className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-          <p className="text-lg font-medium mb-2">
-            Drag and drop your Excel file here
-          </p>
-          <p className="text-muted-foreground mb-4">
-            Or click to browse and select your file
-          </p>
+        <div className="space-y-4">
           <Button 
             onClick={() => fileInputRef.current?.click()} 
             disabled={isLoading}
-            variant="outline"
+            className="w-full"
           >
-            {isLoading ? 'Processing...' : 'Browse Files'}
+            {isLoading ? 'Processing...' : 'Select Excel File'}
           </Button>
           <Input
             ref={fileInputRef}
@@ -140,12 +126,8 @@ export const ExcelUploader = ({ onDataLoaded, isLoading }: ExcelUploaderProps) =
             onChange={(e) => handleFileSelect(e.target.files)}
             className="hidden"
           />
-        </div>
-        <div className="mt-4 text-sm text-muted-foreground">
-          <p>Expected Excel columns:</p>
-          <p className="text-xs mt-1">
-            Device manufacturer, Device product version, CPU model, Total RAM [GB], 
-            Battery Health [%], Energy Consumption, CO2 Emission, etc.
+          <p className="text-sm text-muted-foreground">
+            Select your Excel file with device data (.xlsx or .xls)
           </p>
         </div>
       </CardContent>
