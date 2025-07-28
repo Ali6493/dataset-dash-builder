@@ -7,20 +7,30 @@ interface EnergyAnalysisProps {
 }
 
 export const EnergyAnalysis = ({ data }: EnergyAnalysisProps) => {
-  const energyData = data.map((device, index) => ({
-name: `${device.deviceManufacturer} ${
-  typeof device.deviceProductVersion === 'string'
-    ? device.deviceProductVersion.split(' ')[0]
-    : String(device.deviceProductVersion ?? 'Unknown')
-}`,
-    cpuEnergy: device.cpuEnergyConsumption,
-    diskEnergy: device.diskEnergyConsumption,
-    displayEnergy: device.displayEnergyConsumption,
-    networkEnergy: device.networkEnergyConsumption,
-    totalEnergy: device.totalEnergyConsumption,
-    co2Emission: device.totalCO2Emitted * 1000, // Convert to grams for better visualization
-    index: index + 1
-  })).sort((a, b) => a.totalEnergy - b.totalEnergy);
+  const grouped = data.reduce((acc, device) => {
+    const model = `${device.deviceManufacturer} ${
+      typeof device.deviceProductVersion === 'string'
+        ? device.deviceProductVersion.split(' ')[0]
+        : String(device.deviceProductVersion ?? 'Unknown')
+    }`;
+    if (!acc[model]) acc[model] = [];
+    acc[model].push(device);
+    return acc;
+  }, {} as Record<string, DeviceData[]>);
+
+  const average = (arr: number[]) => arr.reduce((sum, val) => sum + val, 0) / (arr.length || 1);
+
+  const energyData = Object.entries(grouped).map(([name, group]) => {
+    return {
+      name,
+      cpuEnergy: average(group.map(d => d.cpuEnergyConsumption || 0)),
+      diskEnergy: average(group.map(d => d.diskEnergyConsumption || 0)),
+      displayEnergy: average(group.map(d => d.displayEnergyConsumption || 0)),
+      networkEnergy: average(group.map(d => d.networkEnergyConsumption || 0)),
+      totalEnergy: average(group.map(d => d.totalEnergyConsumption || 0)),
+      co2Emission: average(group.map(d => (d.totalCO2Emitted || 0) * 1000))
+    };
+  }).sort((a, b) => a.totalEnergy - b.totalEnergy);
 
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
