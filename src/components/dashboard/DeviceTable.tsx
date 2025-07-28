@@ -11,12 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import {
-  Select,
-  SelectTrigger,
-  SelectContent,
-  SelectItem,
-} from '@/components/ui/select';
+import { Select, SelectTrigger, SelectContent, SelectItem } from '@/components/ui/select';
 import { Search, Filter, ArrowUpDown, ChevronDown, ChevronUp } from 'lucide-react';
 import { DeviceData, getDeviceStatus } from '@/data/laptopData';
 import { cn } from '@/lib/utils';
@@ -33,22 +28,29 @@ export const DeviceTable = ({ data }: DeviceTableProps) => {
   const [sortField, setSortField] = useState<SortField>('deviceManufacturer');
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
   const [collapsed, setCollapsed] = useState(false);
-  const [showFilters, setShowFilters] = useState(false);
-  const [manufacturer, setManufacturer] = useState('all');
-  const [cpuModel, setCpuModel] = useState('all');
+  const [filterOpen, setFilterOpen] = useState(false);
 
-  const unique = (key: keyof DeviceData) => [...new Set(data.map((d) => d[key] ?? ''))].filter((v) => v);
+  const [manufacturerFilter, setManufacturerFilter] = useState('all');
+  const [cpuFilter, setCpuFilter] = useState('all');
+  const [ramFilter, setRamFilter] = useState('');
+  const [gpuFilter, setGpuFilter] = useState('');
+  const [batteryHealthMin, setBatteryHealthMin] = useState('');
+  const [batteryHealthMax, setBatteryHealthMax] = useState('');
 
-  const filteredData = data
-    .filter(device =>
+  const filteredData = data.filter(device => {
+    const status = getDeviceStatus(device);
+    return (
       `${device.deviceManufacturer} ${device.deviceProductVersion} ${device.cpuModel}`
         .toLowerCase()
-        .includes(searchTerm.toLowerCase())
-    )
-    .filter(device =>
-      (manufacturer !== 'all' ? device.deviceManufacturer === manufacturer : true) &&
-      (cpuModel !== 'all' ? device.cpuModel === cpuModel : true)
+        .includes(searchTerm.toLowerCase()) &&
+      (manufacturerFilter === 'all' || device.deviceManufacturer === manufacturerFilter) &&
+      (cpuFilter === 'all' || device.cpuModel === cpuFilter) &&
+      (ramFilter === '' || device.totalRam === Number(ramFilter)) &&
+      (gpuFilter === '' || device.graphicalCards?.toLowerCase().includes(gpuFilter.toLowerCase())) &&
+      (batteryHealthMin === '' || device.batteryHealth >= Number(batteryHealthMin)) &&
+      (batteryHealthMax === '' || device.batteryHealth <= Number(batteryHealthMax))
     );
+  });
 
   const sortedData = [...filteredData].sort((a, b) => {
     const aValue = a[sortField];
@@ -96,6 +98,8 @@ export const DeviceTable = ({ data }: DeviceTableProps) => {
     </TableHead>
   );
 
+  const unique = (key: keyof DeviceData) => [...new Set(data.map((d) => d[key] ?? ''))];
+
   return (
     <Card className="col-span-3">
       <CardHeader>
@@ -111,7 +115,7 @@ export const DeviceTable = ({ data }: DeviceTableProps) => {
                 className="pl-10 w-64"
               />
             </div>
-            <Button variant="outline" size="sm" onClick={() => setShowFilters(!showFilters)}>
+            <Button variant="outline" size="sm" onClick={() => setFilterOpen(!filterOpen)}>
               <Filter className="h-4 w-4 mr-2" />
               Filter
             </Button>
@@ -121,26 +125,30 @@ export const DeviceTable = ({ data }: DeviceTableProps) => {
           </div>
         </div>
 
-        {showFilters && (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mt-4">
-            <Select value={manufacturer} onValueChange={setManufacturer}>
+        {filterOpen && (
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mt-4">
+            <Select onValueChange={setManufacturerFilter} value={manufacturerFilter}>
               <SelectTrigger>Manufacturer</SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All</SelectItem>
-                {unique('deviceManufacturer').map((m) => (
+                {unique('deviceManufacturer').map(m => (
                   <SelectItem key={m} value={m}>{m}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
-            <Select value={cpuModel} onValueChange={setCpuModel}>
-              <SelectTrigger>CPU Model</SelectTrigger>
+            <Select onValueChange={setCpuFilter} value={cpuFilter}>
+              <SelectTrigger>CPU</SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All</SelectItem>
-                {unique('cpuModel').map((m) => (
-                  <SelectItem key={m} value={m}>{m}</SelectItem>
+                {unique('cpuModel').map(c => (
+                  <SelectItem key={c} value={c}>{c}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
+            <Input placeholder="RAM (GB)" value={ramFilter} onChange={(e) => setRamFilter(e.target.value)} />
+            <Input placeholder="GPU" value={gpuFilter} onChange={(e) => setGpuFilter(e.target.value)} />
+            <Input placeholder="Battery Health Min %" value={batteryHealthMin} onChange={(e) => setBatteryHealthMin(e.target.value)} />
+            <Input placeholder="Battery Health Max %" value={batteryHealthMax} onChange={(e) => setBatteryHealthMax(e.target.value)} />
           </div>
         )}
       </CardHeader>
