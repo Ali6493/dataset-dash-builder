@@ -13,7 +13,7 @@ import { MetricCard } from './MetricCard';
 import { PerformanceChart } from './PerformanceChart';
 import { BrandDistribution } from './BrandDistribution';
 import { DeviceTable } from './DeviceTable';
-import { EnergyAnalysis } from './EnergyAnalysis';
+import { EnergyBarChart } from '@/components/dashboard/EnergyAnalysis';
 import { getPerformanceMetrics } from '@/data/laptopData';
 import { DeviceData, sampleDeviceData } from '@/data/laptopData';
 
