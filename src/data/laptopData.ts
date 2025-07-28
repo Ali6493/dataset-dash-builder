@@ -60589,9 +60589,22 @@ export const getPerformanceMetrics = (data: DeviceData[]) => {
   };
 
   const totalDevices = data.length;
-  const avgBatteryHealth = Math.round(
-    data.reduce((sum, device) => sum + (device?.batteryHealth || 0), 0) / totalDevices
-  );
+  const batteryHealthValues = data
+  .map(device => {
+    const health = device?.batteryHealth;
+    if (typeof health === 'number') return health;
+    if (typeof health === 'string') {
+      const parsed = parseFloat(health.replace('%', '').trim());
+      return isNaN(parsed) ? null : parsed;
+    }
+    return null;
+  })
+  .filter((val): val is number => val !== null);
+
+const avgBatteryHealth = batteryHealthValues.length > 0
+  ? Number((batteryHealthValues.reduce((sum, val) => sum + val, 0) / batteryHealthValues.length).toFixed(1))
+  : 0;
+
   const avgCO2Emission = Number(
     (data.reduce((sum, device) => sum + (device?.totalCO2Emitted || 0), 0) / totalDevices).toFixed(6)
   );
