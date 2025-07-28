@@ -62,7 +62,7 @@
     "vaul": "^0.9.3",
     "xlsx": "^0.18.5",
     "zod": "^3.23.8",
-    "react-google-charts": "^4.1.0"
+    "react-google-charts": "^3.0.15"
 
   },
   "devDependencies": {
