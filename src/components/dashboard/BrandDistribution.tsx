@@ -1,33 +1,32 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Chart } from 'react-google-charts';
-import { getManufacturerStats, DeviceData } from '@/data/laptopData';
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Chart } from "react-google-charts";
+import { getManufacturerStats, DeviceData } from "@/data/laptopData";
 
 interface BrandDistributionProps {
   data: DeviceData[];
 }
 
 export const BrandDistribution = ({ data }: BrandDistributionProps) => {
-  const manufacturerStats = getManufacturerStats(data);
+  const stats = getManufacturerStats(data);
 
   const sankeyData = [
-    ['Source', 'Target', 'Value'],
-    ...manufacturerStats.map(stat => ['All Devices', stat.manufacturer, stat.count]),
+    ["From", "To", "Count"],
+    ...stats.map((entry) => ["All Devices", entry.manufacturer, entry.count < 10 ? 10 : entry.count
+])
   ];
 
   const options = {
     sankey: {
       node: {
-        label: {
-          fontSize: 14,
-          color: '#ffffff'
-        },
-        nodePadding: 40
+        label: { fontSize: 14, bold: true, color: "#333" },
+        width: 20,
+        nodePadding: 20
       },
       link: {
-        colorMode: 'gradient',
-        colors: ['#3b82f6', '#10b981', '#facc15', '#f87171', '#a78bfa'],
+        colorMode: "gradient",
+        colors: ["#6366f1", "#3b82f6", "#06b6d4"]
       }
-    },
+    }
   };
 
   return (
@@ -36,16 +35,13 @@ export const BrandDistribution = ({ data }: BrandDistributionProps) => {
         <CardTitle>Manufacturer Distribution</CardTitle>
       </CardHeader>
       <CardContent>
-        <div style={{ height: '300px' }}>
-          <Chart
-            chartType="Sankey"
-            width="100%"
-            height="100%"
-            data={sankeyData}
-            options={options}
-            loader={<div>Loading Chart...</div>}
-          />
-        </div>
+        <Chart
+          chartType="Sankey"
+          width="100%"
+          height="400px"
+          data={sankeyData}
+          options={options}
+        />
       </CardContent>
     </Card>
   );
