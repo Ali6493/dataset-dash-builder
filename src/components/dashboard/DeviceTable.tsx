@@ -126,15 +126,19 @@ export const DeviceTable = ({ data }: DeviceTableProps) => {
                     <TableCell className="font-medium">{device.deviceManufacturer}</TableCell>
                     <TableCell>{device.deviceProductVersion}</TableCell>
                     <TableCell>{device.totalRam}</TableCell>
-                    <TableCell>
-                      <span className={cn(
-                        'font-medium',
-                        device.batteryHealth >= 80 ? 'text-success' :
-                        device.batteryHealth >= 60 ? 'text-warning' : 'text-danger'
-                      )}>
-                        {device.batteryHealth.toFixed(1)}%
-                      </span>
-                    </TableCell>
+                      <TableCell>
+                        <span className={cn(
+                          'font-medium',
+                          typeof device.batteryHealth === 'number'
+                            ? device.batteryHealth >= 80 ? 'text-success' :
+                              device.batteryHealth >= 60 ? 'text-warning' : 'text-danger'
+                            : 'text-muted'
+                        )}>
+                          {typeof device.batteryHealth === 'number'
+                            ? device.batteryHealth.toFixed(1) + '%'
+                            : 'N/A'}
+                        </span>
+                      </TableCell>
                     <TableCell>
                       <span className={cn(
                         'font-medium',
