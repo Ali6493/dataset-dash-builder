@@ -12,7 +12,7 @@ import {
   TableRow 
 } from '@/components/ui/table';
 import { Search, Filter, ArrowUpDown } from 'lucide-react';
-import { DeviceData, getStatusColor, getDeviceStatus } from '@/data/laptopData';
+import { DeviceData, getDeviceStatus } from '@/data/laptopData';
 import { cn } from '@/lib/utils';
 
 type SortField = keyof DeviceData;
@@ -36,17 +36,14 @@ export const DeviceTable = ({ data }: DeviceTableProps) => {
   const sortedData = [...filteredData].sort((a, b) => {
     const aValue = a[sortField];
     const bValue = b[sortField];
-    
     if (typeof aValue === 'string' && typeof bValue === 'string') {
       return sortDirection === 'asc' 
         ? aValue.localeCompare(bValue)
         : bValue.localeCompare(aValue);
     }
-    
     if (typeof aValue === 'number' && typeof bValue === 'number') {
       return sortDirection === 'asc' ? aValue - bValue : bValue - aValue;
     }
-    
     return 0;
   });
 
@@ -105,16 +102,27 @@ export const DeviceTable = ({ data }: DeviceTableProps) => {
         </div>
       </CardHeader>
       <CardContent>
-        <div className="rounded-md border">
+        <div className="rounded-md border overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>
                 <SortableHeader field="deviceManufacturer">Manufacturer</SortableHeader>
                 <SortableHeader field="deviceProductVersion">Model</SortableHeader>
+                <SortableHeader field="cpuModel">CPU Model</SortableHeader>
                 <SortableHeader field="totalRam">RAM (GB)</SortableHeader>
+                <TableHead>GPU</TableHead>
+                <TableHead># GPUs</TableHead>
+                <TableHead>GPU RAM</TableHead>
+                <TableHead>Battery Designed</TableHead>
+                <TableHead>Battery Full</TableHead>
                 <SortableHeader field="batteryHealth">Battery Health</SortableHeader>
-                <SortableHeader field="totalEnergyConsumption">Energy (Wh)</SortableHeader>
-                <SortableHeader field="totalCO2Emitted">CO2 (kg)</SortableHeader>
+                <TableHead>Battery Life</TableHead>
+                <TableHead>CPU Energy</TableHead>
+                <TableHead>Disk Energy</TableHead>
+                <TableHead>Display Energy</TableHead>
+                <TableHead>Network Energy</TableHead>
+                <SortableHeader field="totalEnergyConsumption">Total Energy</SortableHeader>
+                <SortableHeader field="totalCO2Emitted">CO2</SortableHeader>
                 <TableHead>Status</TableHead>
               </TableRow>
             </TableHeader>
@@ -123,42 +131,23 @@ export const DeviceTable = ({ data }: DeviceTableProps) => {
                 const status = getDeviceStatus(device);
                 return (
                   <TableRow key={device.id} className="hover:bg-muted/50">
-                    <TableCell className="font-medium">{device.deviceManufacturer}</TableCell>
+                    <TableCell>{device.deviceManufacturer}</TableCell>
                     <TableCell>{device.deviceProductVersion}</TableCell>
+                    <TableCell>{device.cpuModel}</TableCell>
                     <TableCell>{device.totalRam}</TableCell>
-                      <TableCell>
-                        <span className={cn(
-                          'font-medium',
-                          typeof device.batteryHealth === 'number'
-                            ? device.batteryHealth >= 80 ? 'text-success' :
-                              device.batteryHealth >= 60 ? 'text-warning' : 'text-danger'
-                            : 'text-muted'
-                        )}>
-                          {typeof device.batteryHealth === 'number'
-                            ? device.batteryHealth.toFixed(1) + '%'
-                            : 'N/A'}
-                        </span>
-                      </TableCell>
-                    <TableCell>
-                      <span className={cn(
-                        'font-medium',
-                        device.totalEnergyConsumption <= 20 ? 'text-success' :
-                        device.totalEnergyConsumption <= 40 ? 'text-warning' : 'text-danger'
-                      )}>
-                            {typeof device.batteryHealth === 'number' 
-                              ? device.batteryHealth.toFixed(2) + '%' 
-                              : 'N/A'}
-                      </span>
-                    </TableCell>
-                    <TableCell>
-                      <span className={cn(
-                        'font-medium',
-                        device.totalCO2Emitted <= 0.005 ? 'text-success' :
-                        device.totalCO2Emitted <= 0.015 ? 'text-warning' : 'text-danger'
-                      )}>
-                        {device.totalCO2Emitted.toFixed(6)}
-                      </span>
-                    </TableCell>
+                    <TableCell>{device.graphicalCards}</TableCell>
+                    <TableCell>{device.numberOfGraphicalCards}</TableCell>
+                    <TableCell>{device.graphicalCardRam}</TableCell>
+                    <TableCell>{device.batteryDesignedCapacity}</TableCell>
+                    <TableCell>{device.batteryFullChargeCapacity}</TableCell>
+                    <TableCell>{device.batteryHealth?.toFixed(1)}%</TableCell>
+                    <TableCell>{device.estimatedBatteryLife}</TableCell>
+                    <TableCell>{device.cpuEnergyConsumption}</TableCell>
+                    <TableCell>{device.diskEnergyConsumption}</TableCell>
+                    <TableCell>{device.displayEnergyConsumption}</TableCell>
+                    <TableCell>{device.networkEnergyConsumption}</TableCell>
+                    <TableCell>{device.totalEnergyConsumption}</TableCell>
+                    <TableCell>{device.totalCO2Emitted.toFixed(6)}</TableCell>
                     <TableCell>
                       <Badge variant={getStatusBadgeVariant(status)}>
                         {status}
