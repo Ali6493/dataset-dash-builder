@@ -1,10 +1,8 @@
-import { useState, useMemo } from 'react';
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardContent,
-} from '@/components/ui/card';
+import { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import {
   Table,
   TableBody,
@@ -13,48 +11,53 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import {
-  Select,
-  SelectTrigger,
-  SelectContent,
-  SelectItem,
-  SelectValue,
-} from '@/components/ui/select';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { getDeviceStatus, DeviceData } from '@/data/laptopData';
+import { Search, Filter, ArrowUpDown, ChevronDown, ChevronUp } from 'lucide-react';
+import { DeviceData, getDeviceStatus } from '@/data/laptopData';
+import { cn } from '@/lib/utils';
+
+type SortField = keyof DeviceData;
+type SortDirection = 'asc' | 'desc';
 
 interface DeviceTableProps {
   data: DeviceData[];
 }
 
 export const DeviceTable = ({ data }: DeviceTableProps) => {
-  const [manufacturer, setManufacturer] = useState('all');
-  const [cpuModel, setCpuModel] = useState('all');
-  const [ram, setRam] = useState('');
-  const [gpu, setGpu] = useState('');
-  const [batteryHealthMin, setBatteryHealthMin] = useState('');
-  const [batteryHealthMax, setBatteryHealthMax] = useState('');
-  const [statusFilter, setStatusFilter] = useState<string[]>([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [sortField, setSortField] = useState<SortField>('deviceManufacturer');
+  const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
+  const [collapsed, setCollapsed] = useState(true);
 
-  const unique = (key: keyof DeviceData) => [...new Set(data.map((d) => d[key] ?? ''))];
+  const filteredData = data.filter(device =>
+    `${device.deviceManufacturer} ${device.deviceProductVersion} ${device.cpuModel}`
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase())
+  );
 
-  const filtered = useMemo(() => {
-    return data.filter((device) => {
-      const status = getDeviceStatus(device);
-      return (
-        (manufacturer !== 'all' ? device.deviceManufacturer === manufacturer : true) &&
-        (cpuModel !== 'all' ? device.cpuModel === cpuModel : true) &&
-        (ram ? device.totalRam === Number(ram) : true) &&
-        (gpu ? device.graphicalCards === gpu : true) &&
-        (batteryHealthMin ? device.batteryHealth >= Number(batteryHealthMin) : true) &&
-        (batteryHealthMax ? device.batteryHealth <= Number(batteryHealthMax) : true) &&
-        (statusFilter.length ? statusFilter.includes(status) : true)
-      );
-    });
-  }, [data, manufacturer, cpuModel, ram, gpu, batteryHealthMin, batteryHealthMax, statusFilter]);
+  const sortedData = [...filteredData].sort((a, b) => {
+    const aValue = a[sortField];
+    const bValue = b[sortField];
+    if (typeof aValue === 'string' && typeof bValue === 'string') {
+      return sortDirection === 'asc'
+        ? aValue.localeCompare(bValue)
+        : bValue.localeCompare(aValue);
+    }
+    if (typeof aValue === 'number' && typeof bValue === 'number') {
+      return sortDirection === 'asc' ? aValue - bValue : bValue - aValue;
+    }
+    return 0;
+  });
 
-  const getStatusBadge = (status: string) => {
+  const handleSort = (field: SortField) => {
+    if (sortField === field) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortDirection('asc');
+    }
+  };
+
+  const getStatusBadgeVariant = (status: string) => {
     switch (status) {
       case 'excellent': return 'default';
       case 'good': return 'secondary';
@@ -64,79 +67,114 @@ export const DeviceTable = ({ data }: DeviceTableProps) => {
     }
   };
 
+  const SortableHeader = ({ field, children }: { field: SortField; children: React.ReactNode }) => (
+    <TableHead>
+      <Button
+        variant="ghost"
+        onClick={() => handleSort(field)}
+        className="h-auto p-0 font-semibold hover:bg-transparent"
+      >
+        {children}
+        <ArrowUpDown className="ml-2 h-4 w-4" />
+      </Button>
+    </TableHead>
+  );
+
   return (
     <Card className="col-span-3">
       <CardHeader>
-        <CardTitle>Device Inventory</CardTitle>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mt-4">
-          <Select value={manufacturer} onValueChange={setManufacturer}>
-            <SelectTrigger>
-              <SelectValue placeholder="Manufacturer" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All</SelectItem>
-              {unique('deviceManufacturer').filter(Boolean).map((m) => (
-                <SelectItem key={m} value={m}>{m}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-
-          <Select value={cpuModel} onValueChange={setCpuModel}>
-            <SelectTrigger>
-              <SelectValue placeholder="CPU Model" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All</SelectItem>
-              {unique('cpuModel').filter(Boolean).map((c) => (
-                <SelectItem key={c} value={c}>{c}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-
-          <Input placeholder="RAM (GB)" value={ram} onChange={(e) => setRam(e.target.value)} />
-          <Input placeholder="GPU Model" value={gpu} onChange={(e) => setGpu(e.target.value)} />
-          <Input placeholder="Battery Health Min %" value={batteryHealthMin} onChange={(e) => setBatteryHealthMin(e.target.value)} />
-          <Input placeholder="Battery Health Max %" value={batteryHealthMax} onChange={(e) => setBatteryHealthMax(e.target.value)} />
+        <div className="flex items-center justify-between">
+          <CardTitle className="text-lg">Device Inventory</CardTitle>
+          <div className="flex items-center gap-2">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search devices..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10 w-64"
+              />
+            </div>
+            <Button variant="outline" size="sm">
+              <Filter className="h-4 w-4 mr-2" />
+              Filter
+            </Button>
+            <Button variant="ghost" size="sm" onClick={() => setCollapsed(!collapsed)}>
+              {collapsed ? <ChevronDown className="w-4 h-4" /> : <ChevronUp className="w-4 h-4" />}
+            </Button>
+          </div>
         </div>
       </CardHeader>
 
-      <CardContent>
-        <div className="rounded-md border overflow-x-auto">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Manufacturer</TableHead>
-                <TableHead>Model</TableHead>
-                <TableHead>CPU</TableHead>
-                <TableHead>RAM</TableHead>
-                <TableHead>GPU</TableHead>
-                <TableHead>Battery</TableHead>
-                <TableHead>Status</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filtered.map((device) => (
-                <TableRow key={device.id}>
-                  <TableCell>{device.deviceManufacturer}</TableCell>
-                  <TableCell>{device.deviceProductVersion}</TableCell>
-                  <TableCell>{device.cpuModel}</TableCell>
-                  <TableCell>{device.totalRam}</TableCell>
-                  <TableCell>{device.graphicalCards}</TableCell>
-                  <TableCell>{device.batteryHealth}%</TableCell>
-                  <TableCell>
-                    <Badge variant={getStatusBadge(getDeviceStatus(device))}>
-                      {getDeviceStatus(device)}
-                    </Badge>
-                  </TableCell>
+      {!collapsed && (
+        <CardContent>
+          <div className="rounded-md border overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <SortableHeader field="deviceManufacturer">Manufacturer</SortableHeader>
+                  <SortableHeader field="deviceProductVersion">Model</SortableHeader>
+                  <SortableHeader field="cpuModel">CPU Model</SortableHeader>
+                  <SortableHeader field="totalRam">RAM (GB)</SortableHeader>
+                  <TableHead>GPU</TableHead>
+                  <TableHead># GPUs</TableHead>
+                  <TableHead>GPU RAM</TableHead>
+                  <TableHead>Battery Designed</TableHead>
+                  <TableHead>Battery Full</TableHead>
+                  <SortableHeader field="batteryHealth">Battery Health</SortableHeader>
+                  <TableHead>Battery Life</TableHead>
+                  <TableHead>CPU Energy</TableHead>
+                  <TableHead>Disk Energy</TableHead>
+                  <TableHead>Display Energy</TableHead>
+                  <TableHead>Network Energy</TableHead>
+                  <SortableHeader field="totalEnergyConsumption">Total Energy</SortableHeader>
+                  <SortableHeader field="totalCO2Emitted">CO2</SortableHeader>
+                  <TableHead>Status</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
-        <div className="mt-4 text-sm text-muted-foreground">
-          Showing {filtered.length} of {data.length} devices
-        </div>
-      </CardContent>
+              </TableHeader>
+              <TableBody>
+                {sortedData.map((device) => {
+                  const status = getDeviceStatus(device);
+                  return (
+                    <TableRow key={device.id} className="hover:bg-muted/50">
+                      <TableCell>{device.deviceManufacturer}</TableCell>
+                      <TableCell className="max-w-[180px] truncate">{device.deviceProductVersion}</TableCell>
+                      <TableCell className="max-w-[200px] truncate">{device.cpuModel}</TableCell>
+                      <TableCell>{device.totalRam}</TableCell>
+                      <TableCell>{device.graphicalCards}</TableCell>
+                      <TableCell>{device.numberOfGraphicalCards}</TableCell>
+                      <TableCell>{device.graphicalCardRam}</TableCell>
+                      <TableCell>{device.batteryDesignedCapacity}</TableCell>
+                      <TableCell>{device.batteryFullChargeCapacity}</TableCell>
+                      <TableCell>
+                        {typeof device.batteryHealth === 'number'
+                          ? device.batteryHealth.toFixed(1) + '%'
+                          : typeof device.batteryHealth === 'string' && device.batteryHealth.trim().endsWith('%')
+                            ? device.batteryHealth
+                            : 'N/A'}
+                      </TableCell>
+                      <TableCell>{device.estimatedBatteryLife}</TableCell>
+                      <TableCell>{device.cpuEnergyConsumption}</TableCell>
+                      <TableCell>{device.diskEnergyConsumption}</TableCell>
+                      <TableCell>{device.displayEnergyConsumption}</TableCell>
+                      <TableCell>{device.networkEnergyConsumption}</TableCell>
+                      <TableCell>{device.totalEnergyConsumption}</TableCell>
+                      <TableCell>{device.totalCO2Emitted.toFixed(6)}</TableCell>
+                      <TableCell>
+                        <Badge variant={getStatusBadgeVariant(status)}>{status}</Badge>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </div>
+          <div className="flex items-center justify-between mt-4 text-sm text-muted-foreground">
+            <span>Showing {sortedData.length} of {data.length} devices</span>
+            <span>{sortedData.filter(d => getDeviceStatus(d) === 'critical').length} critical alerts</span>
+          </div>
+        </CardContent>
+      )}
     </Card>
   );
 };
