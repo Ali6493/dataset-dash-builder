@@ -1,156 +1,99 @@
 import { useState } from 'react';
-import { 
-  Monitor, 
-  Battery, 
-  Leaf, 
-  AlertTriangle, 
-  TrendingUp,
-  Zap,
-  Server,
-  Factory
-} from 'lucide-react';
-import { MetricCard } from './MetricCard';
-import { PerformanceChart } from './PerformanceChart';
-import { BrandDistribution } from './BrandDistribution';
-import { DeviceTable } from './DeviceTable';
-import { EnergyBarChart } from '@/components/dashboard/EnergyAnalysis';
-import { CompanyComparisonChart } from '@/components/dashboard/CompanyComparisonChart';
-import { getPerformanceMetrics } from '@/data/laptopData';
-import { DeviceData, sampleDeviceData } from '@/data/laptopData';
+import {
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  LabelList,
+} from 'recharts';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Select, SelectTrigger, SelectContent, SelectItem } from '@/components/ui/select';
+import { DeviceData } from '@/data/laptopData';
 
-export const Dashboard = () => {
-  const [deviceData, setDeviceData] = useState<DeviceData[]>(sampleDeviceData);
-  
-  const metrics = getPerformanceMetrics(deviceData);
+interface ComparisonChartProps {
+  data: DeviceData[];
+}
+
+export const CompanyComparisonChart = ({ data }: ComparisonChartProps) => {
+  const [company1, setCompany1] = useState('');
+  const [company2, setCompany2] = useState('');
+
+  const uniqueManufacturers = [...new Set(data.map(d => d.deviceManufacturer))];
+
+  const aggregateCompanyData = (company: string) => {
+    const devices = data.filter(d => d.deviceManufacturer === company);
+    const total = (key: keyof DeviceData) =>
+      devices.reduce((sum, device) => sum + (device[key] as number || 0), 0);
+
+    const avg = (key: keyof DeviceData) => devices.length ? total(key) / devices.length : 0;
+
+    return {
+      name: company,
+      batteryHealth: avg('batteryHealth'),
+      cpuEnergy: avg('cpuEnergyConsumption'),
+      diskEnergy: avg('diskEnergyConsumption'),
+      displayEnergy: avg('displayEnergyConsumption'),
+      networkEnergy: avg('networkEnergyConsumption'),
+      totalEnergy: avg('totalEnergyConsumption'),
+      co2: avg('totalCO2Emitted'),
+    };
+  };
+
+  const chartData = [company1, company2]
+    .filter(Boolean)
+    .map(company => aggregateCompanyData(company));
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto p-6 space-y-6">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-4xl font-bold text-foreground">Device Energy & Performance Dashboard</h1>
-            <p className="text-muted-foreground mt-2">
-              Monitor device energy consumption, CO2 emissions, and performance metrics
-            </p>
-          </div>
-          <div className="flex items-center gap-4">
-            <div className="text-right">
-              <p className="text-sm text-muted-foreground">Last Updated</p>
-              <p className="font-medium">{new Date().toLocaleString()}</p>
-            </div>
-          </div>
+    <Card className="col-span-2">
+      <CardHeader>
+        <CardTitle>Company Comparison</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="flex flex-col md:flex-row gap-4 mb-6">
+          <Select onValueChange={setCompany1} value={company1}>
+            <SelectTrigger>Company 1</SelectTrigger>
+            <SelectContent>
+              {uniqueManufacturers.map(m => (
+                <SelectItem key={m} value={m}>{m}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Select onValueChange={setCompany2} value={company2}>
+            <SelectTrigger>Company 2</SelectTrigger>
+            <SelectContent>
+              {uniqueManufacturers.map(m => (
+                <SelectItem key={m} value={m}>{m}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
-
-        {/* Key Metrics */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <MetricCard
-            title="Total Devices"
-            value={metrics.totalDevices.toString()}
-            icon={<Monitor className="h-6 w-6" />}
-            description="Connected devices"
-          />
-          <MetricCard
-            title="Avg Battery Health"
-            value={`${metrics.avgBatteryHealth}%`}
-            icon={<Battery className="h-6 w-6" />}
-            description="Fleet average"
-          />
-          <MetricCard
-            title="Avg CO2 Emission"
-            value={`${metrics.avgCO2Emission} kg`}
-            icon={<Leaf className="h-6 w-6" />}
-            description="Carbon footprint"
-            variant="warning"
-          />
-          <MetricCard
-            title="Avg Energy Usage"
-            value={`${metrics.avgEnergyConsumption} Wh`}
-            icon={<Zap className="h-6 w-6" />}
-            description="Power consumption"
-          />
-        </div>
-
-        {/* Performance Overview */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div>
-            <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2">
-              <TrendingUp className="h-6 w-6" />
-              Performance Trends
-            </h2>
-            <PerformanceChart data={deviceData} />
-          </div>
-          <div>
-            <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2">
-              <Factory className="h-6 w-6" />
-              Manufacturer Distribution
-            </h2>
-            <BrandDistribution data={deviceData} />
-          </div>
-        </div>
-
-        {/* Detailed Analysis */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div>
-            <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2">
-              <Zap className="h-6 w-6" />
-              Energy Consumption Analysis
-            </h2>
-            <EnergyBarChart data={deviceData} />
-          </div>
-
-          <div>
-            <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2">
-              <Factory className="h-6 w-6" />
-              Company Comparison
-            </h2>
-            <CompanyComparisonChart data={deviceData} />
-          </div>
-        </div>
-
-        {/* Fleet Health */}
-        <div className="space-y-6">
-          <div>
-            <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2">
-              <Server className="h-6 w-6" />
-              Fleet Health Overview
-            </h2>
-            <div className="grid grid-cols-2 gap-4">
-              <MetricCard
-                title="Healthy Systems"
-                value={`${metrics.healthyPercentage}%`}
-                icon={<TrendingUp className="h-5 w-5" />}
-                description="Good or excellent"
-              />
-              <MetricCard
-                title="Critical Alerts"
-                value={metrics.criticalCount.toString()}
-                icon={<AlertTriangle className="h-5 w-5" />}
-                description="Require attention"
-                variant="destructive"
-              />
-              <MetricCard
-                title="Excellent Devices"
-                value={metrics.excellentCount.toString()}
-                icon={<Battery className="h-5 w-5" />}
-                description="Top performers"
-              />
-              <MetricCard
-                title="Total Energy"
-                value={`${deviceData.reduce((sum, d) => sum + d.totalEnergyConsumption, 0).toFixed(1)} Wh`}
-                icon={<Zap className="h-5 w-5" />}
-                description="Fleet consumption"
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* Detailed Table */}
-        <div>
-          <h2 className="text-2xl font-semibold mb-4">Device Inventory</h2>
-          <DeviceTable data={deviceData} />
-        </div>
-      </div>
-    </div>
+        <ResponsiveContainer width="100%" height={350}>
+          <BarChart
+            data={chartData}
+            margin={{ top: 10, right: 30, left: 20, bottom: 30 }}
+            barCategoryGap={30}
+          >
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="name" />
+            <YAxis />
+            <Tooltip />
+            <Legend />
+            <Bar dataKey="batteryHealth" fill="hsl(var(--success))" name="Battery Health (%)">
+              <LabelList dataKey="batteryHealth" position="top" formatter={(v: number) => v.toFixed(1)} />
+            </Bar>
+            <Bar dataKey="cpuEnergy" fill="hsl(var(--primary))" name="CPU Energy (Wh)" />
+            <Bar dataKey="diskEnergy" fill="hsl(var(--warning))" name="Disk Energy (Wh)" />
+            <Bar dataKey="displayEnergy" fill="hsl(var(--accent))" name="Display Energy (Wh)" />
+            <Bar dataKey="networkEnergy" fill="hsl(var(--muted))" name="Network Energy (Wh)" />
+            <Bar dataKey="totalEnergy" fill="hsl(var(--foreground))" name="Total Energy (Wh)" />
+            <Bar dataKey="co2" fill="hsl(var(--danger))" name="CO2 Emissions (kg)" />
+          </BarChart>
+        </ResponsiveContainer>
+      </CardContent>
+    </Card>
   );
 };
