@@ -24,42 +24,57 @@ export const CompanyComparisonChart = ({ data }: ComparisonChartProps) => {
 
   const uniqueManufacturers = [...new Set(data.map(d => d.deviceManufacturer))];
 
+  const metrics = [
+    { key: 'batteryHealth', label: 'Battery Health (%)', color: 'hsl(var(--success))' },
+    { key: 'cpuEnergy', label: 'CPU Energy (Wh)', color: 'hsl(var(--primary))' },
+    { key: 'diskEnergy', label: 'Disk Energy (Wh)', color: 'hsl(var(--warning))' },
+    { key: 'displayEnergy', label: 'Display Energy (Wh)', color: 'hsl(var(--accent))' },
+    { key: 'networkEnergy', label: 'Network Energy (Wh)', color: '#8884d8' },
+    { key: 'totalEnergy', label: 'Total Energy (Wh)', color: 'hsl(var(--foreground))' },
+    { key: 'co2', label: 'CO2 Emissions (kg)', color: 'hsl(var(--danger))' },
+  ];
+
   const aggregateCompanyData = (company: string) => {
     const devices = data.filter(d => d.deviceManufacturer === company);
     const total = (key: keyof DeviceData) =>
       devices.reduce((sum, device) => sum + (device[key] as number || 0), 0);
-
     const avg = (key: keyof DeviceData) => devices.length ? total(key) / devices.length : 0;
 
     return {
       name: company,
       batteryHealth: avg('batteryHealth'),
-      totalEnergy: avg('totalEnergyConsumption'),
       cpuEnergy: avg('cpuEnergyConsumption'),
       diskEnergy: avg('diskEnergyConsumption'),
       displayEnergy: avg('displayEnergyConsumption'),
       networkEnergy: avg('networkEnergyConsumption'),
+      totalEnergy: avg('totalEnergyConsumption'),
       co2: avg('totalCO2Emitted'),
     };
   };
 
-  const chartData = [company1, company2]
-    .filter(Boolean)
-    .map(company => aggregateCompanyData(company));
-
-  const metrics = [
-    { key: 'batteryHealth', label: 'Battery Health (%)', color: 'hsl(var(--success))' },
-    { key: 'totalEnergy', label: 'Total Energy (Wh)', color: 'hsl(var(--foreground))' },
-    { key: 'cpuEnergy', label: 'CPU Energy (Wh)', color: 'hsl(var(--primary))' },
-    { key: 'diskEnergy', label: 'Disk Energy (Wh)', color: 'hsl(var(--warning))' },
-    { key: 'displayEnergy', label: 'Display Energy (Wh)', color: 'hsl(var(--accent))' },
-    { key: 'networkEnergy', label: 'Network Energy (Wh)', color: '#8884d8' }, // Custom purple
-    { key: 'co2', label: 'CO2 Emissions (kg)', color: 'hsl(var(--danger))' },
-  ];
-
-  const selectedMetrics = selectedMetric === 'all'
-    ? metrics
-    : metrics.filter(m => m.key === selectedMetric);
+  const chartData = selectedMetric === 'all'
+    ? metrics.flatMap(metric => {
+        const dataPoints = [];
+        if (company1) {
+          const val = aggregateCompanyData(company1)[metric.key as keyof ReturnType<typeof aggregateCompanyData>];
+          dataPoints.push({ category: metric.label, company: company1, value: val, color: metric.color });
+        }
+        if (company2) {
+          const val = aggregateCompanyData(company2)[metric.key as keyof ReturnType<typeof aggregateCompanyData>];
+          dataPoints.push({ category: metric.label, company: company2, value: val, color: metric.color });
+        }
+        return dataPoints;
+      })
+    : [company1, company2].filter(Boolean).map(company => {
+        const agg = aggregateCompanyData(company);
+        const metricObj = metrics.find(m => m.key === selectedMetric)!;
+        return {
+          category: metricObj.label,
+          company,
+          value: agg[selectedMetric as keyof typeof agg],
+          color: metricObj.color,
+        };
+      });
 
   return (
     <Card className="col-span-2">
@@ -86,9 +101,7 @@ export const CompanyComparisonChart = ({ data }: ComparisonChartProps) => {
           </Select>
           <Select onValueChange={setSelectedMetric} value={selectedMetric}>
             <SelectTrigger>
-              {selectedMetric === 'all'
-                ? 'All Metrics'
-                : metrics.find(m => m.key === selectedMetric)?.label}
+              {selectedMetric === 'all' ? 'All Metrics' : metrics.find(m => m.key === selectedMetric)?.label}
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Metrics</SelectItem>
@@ -101,22 +114,25 @@ export const CompanyComparisonChart = ({ data }: ComparisonChartProps) => {
         <ResponsiveContainer width="100%" height={350}>
           <BarChart
             data={chartData}
-            margin={{ top: 10, right: 30, left: 20, bottom: 30 }}
-            barCategoryGap={30}
+            layout="vertical"
+            margin={{ top: 10, right: 30, left: 100, bottom: 30 }}
+            barCategoryGap={selectedMetric === 'all' ? 10 : 30}
           >
             <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="name" />
-            <YAxis />
-            {/* Tooltip removed */}
+            <XAxis type="number" />
+            <YAxis dataKey="category" type="category" />
+            {/* No Tooltip */}
             <Legend />
-            {selectedMetrics.map(metric => (
+            {[company1, company2].filter(Boolean).map(company => (
               <Bar
-                key={metric.key}
-                dataKey={metric.key}
-                fill={metric.color}
-                name={metric.label}
+                key={company}
+                dataKey="value"
+                data={chartData.filter(d => d.company === company)}
+                name={company}
+                fill={chartData.find(d => d.company === company)?.color || 'gray'}
+                barSize={20}
               >
-                <LabelList dataKey={metric.key} position="top" formatter={(v: number) => v.toFixed(1)} />
+                <LabelList dataKey="value" position="right" formatter={(v: number) => v.toFixed(1)} />
               </Bar>
             ))}
           </BarChart>
