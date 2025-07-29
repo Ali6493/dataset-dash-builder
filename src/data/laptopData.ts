@@ -24,6 +24,28 @@ export interface DeviceData {
   status: 'excellent' | 'good' | 'warning' | 'critical';
 }
 
+// Fix column header mapping to your fields
+const normalize = (item: any) => ({
+  deviceManufacturer: item['Device manufacturer'] ?? '',
+  deviceProductVersion: item['Device product version'] ?? '',
+  cpuModel: item['CPU model'] ?? '',
+  totalRam: Number(item['Total RAM [GB]'] ?? 0),
+  graphicalCards: item['Graphical cards'] ?? '',
+  numberOfGraphicalCards: Number(item['Number of graphical cards'] ?? 0),
+  graphicalCardRam: Number(item['Graphical card RAM [GB]'] ?? 0),
+  batteryDesignedCapacity: Number(item['Battery Designed Capacity (mAh  )'] ?? 0),
+  batteryFullChargeCapacity: Number(item['Battery Full Charge Capacity (mAh  )'] ?? 0),
+  batteryHealth: Number(item['Battery Health (Get Battery Status) [%]'] ?? 0),
+  estimatedBatteryLife: Number(item['Estimated Battery Life (Hours)'] ?? 0),
+  cpuEnergyConsumption: Number(item['CPU Energy Consumption (Watt Hours)'] ?? 0),
+  diskEnergyConsumption: Number(item['Disk Energy Consumption (Watt Hours)'] ?? 0),
+  displayEnergyConsumption: Number(item['Display Energy Consumption (Watt Hours)'] ?? 0),
+  networkEnergyConsumption: Number(item['Network Energy Consumption (Watt Hours)'] ?? 0),
+  totalCO2Emitted: Number(item['Total CO2 Emitted (CO2KG)'] ?? 0),
+  totalEnergyConsumption: Number(item['Total Energy Consumption (Watt Hours)'] ?? 0),
+  acAdapterWatt: Number(item['AC Adapter Watt'] ?? 0),
+});
+
 export const loadDeviceData = async (): Promise<DeviceData[]> => {
   const response = await fetch(rawData);
   const arrayBuffer = await response.arrayBuffer();
@@ -33,30 +55,16 @@ export const loadDeviceData = async (): Promise<DeviceData[]> => {
   const worksheet = workbook.Sheets[sheetName];
   const jsonData = XLSX.utils.sheet_to_json<any>(worksheet);
 
-  // Convert Excel data to DeviceData objects
-  return jsonData.map((item, index) => ({
-    id: item.id || `generated-id-${index}`,
-    deviceManufacturer: item.deviceManufacturer,
-    deviceProductVersion: item.deviceProductVersion,
-    cpuModel: item.cpuModel,
-    totalRam: Number(item.totalRam),
-    graphicalCards: item.graphicalCards,
-    numberOfGraphicalCards: Number(item.numberOfGraphicalCards),
-    graphicalCardRam: Number(item.graphicalCardRam),
-    batteryDesignedCapacity: Number(item.batteryDesignedCapacity),
-    batteryFullChargeCapacity: Number(item.batteryFullChargeCapacity),
-    batteryHealth: Number(item.batteryHealth),
-    estimatedBatteryLife: Number(item.estimatedBatteryLife),
-    cpuEnergyConsumption: Number(item.cpuEnergyConsumption),
-    diskEnergyConsumption: Number(item.diskEnergyConsumption),
-    displayEnergyConsumption: Number(item.displayEnergyConsumption),
-    networkEnergyConsumption: Number(item.networkEnergyConsumption),
-    totalCO2Emitted: Number(item.totalCO2Emitted),
-    totalEnergyConsumption: Number(item.totalEnergyConsumption),
-    acAdapterWatt: Number(item.acAdapterWatt),
-    status: getDeviceStatus(item as DeviceData),
-  }));
+  return jsonData.map((item, index) => {
+    const normalized = normalize(item);
+    return {
+      id: `generated-id-${index}`,
+      ...normalized,
+      status: getDeviceStatus(normalized as DeviceData),
+    };
+  });
 };
+
 export const getManufacturerStats = (data: DeviceData[]) => {
   if (!data || data.length === 0) return [];
 
@@ -71,12 +79,14 @@ export const getManufacturerStats = (data: DeviceData[]) => {
     percentage: Math.round((count / data.length) * 100)
   }));
 };
+
 export const getDeviceStatus = (device: DeviceData): 'excellent' | 'good' | 'warning' | 'critical' => {
   if (device.batteryHealth >= 90 && device.totalEnergyConsumption <= 20) return 'excellent';
   if (device.batteryHealth >= 70 && device.totalEnergyConsumption <= 40) return 'good';
   if (device.batteryHealth >= 50 && device.totalEnergyConsumption <= 60) return 'warning';
   return 'critical';
 };
+
 export const getPerformanceMetrics = (data: DeviceData[]) => {
   if (!data || data.length === 0) return {
     totalDevices: 0,
@@ -118,4 +128,3 @@ export const getPerformanceMetrics = (data: DeviceData[]) => {
     healthyPercentage: Math.round(((excellentCount + goodCount) / totalDevices) * 100)
   };
 };
-
