@@ -21,6 +21,7 @@ interface ComparisonChartProps {
 export const CompanyComparisonChart = ({ data }: ComparisonChartProps) => {
   const [company1, setCompany1] = useState('');
   const [company2, setCompany2] = useState('');
+  const [selectedMetric, setSelectedMetric] = useState('all');
 
   const uniqueManufacturers = [...new Set(data.map(d => d.deviceManufacturer))];
 
@@ -47,6 +48,20 @@ export const CompanyComparisonChart = ({ data }: ComparisonChartProps) => {
     .filter(Boolean)
     .map(company => aggregateCompanyData(company));
 
+    const metrics = [
+    { key: 'batteryHealth', label: 'Battery Health (%)', color: 'hsl(var(--success))' },
+    { key: 'cpuEnergy', label: 'CPU Energy (Wh)', color: 'hsl(var(--primary))' },
+    { key: 'diskEnergy', label: 'Disk Energy (Wh)', color: 'hsl(var(--warning))' },
+    { key: 'displayEnergy', label: 'Display Energy (Wh)', color: 'hsl(var(--accent))' },
+    { key: 'networkEnergy', label: 'Network Energy (Wh)', color: 'hsl(var(--muted))' },
+    { key: 'totalEnergy', label: 'Total Energy (Wh)', color: 'hsl(var(--foreground))' },
+    { key: 'co2', label: 'CO2 Emissions (kg)', color: 'hsl(var(--danger))' },
+  ];
+
+  const selectedMetrics = selectedMetric === 'all' 
+    ? metrics 
+    : metrics.filter(m => m.key === selectedMetric);
+  
   return (
     <Card className="col-span-2">
       <CardHeader>
@@ -63,10 +78,19 @@ export const CompanyComparisonChart = ({ data }: ComparisonChartProps) => {
             </SelectContent>
           </Select>
           <Select onValueChange={setCompany2} value={company2}>
-            <SelectTrigger>Company 2</SelectTrigger>
+            <SelectTrigger>{company2 || 'Select Company 2'}</SelectTrigger>
             <SelectContent>
               {uniqueManufacturers.map(m => (
                 <SelectItem key={m} value={m}>{m}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Select onValueChange={setSelectedMetric} value={selectedMetric}>
+            <SelectTrigger>{selectedMetric === 'all' ? 'All Metrics' : metrics.find(m => m.key === selectedMetric)?.label}</SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Metrics</SelectItem>
+              {metrics.map(m => (
+                <SelectItem key={m.key} value={m.key}>{m.label}</SelectItem>
               ))}
             </SelectContent>
           </Select>
@@ -82,15 +106,16 @@ export const CompanyComparisonChart = ({ data }: ComparisonChartProps) => {
             <YAxis />
             <Tooltip />
             <Legend />
-            <Bar dataKey="batteryHealth" fill="hsl(var(--success))" name="Battery Health (%)">
-              <LabelList dataKey="batteryHealth" position="top" formatter={(v: number) => v.toFixed(1)} />
-            </Bar>
-            <Bar dataKey="cpuEnergy" fill="hsl(var(--primary))" name="CPU Energy (Wh)" />
-            <Bar dataKey="diskEnergy" fill="hsl(var(--warning))" name="Disk Energy (Wh)" />
-            <Bar dataKey="displayEnergy" fill="hsl(var(--accent))" name="Display Energy (Wh)" />
-            <Bar dataKey="networkEnergy" fill="hsl(var(--muted))" name="Network Energy (Wh)" />
-            <Bar dataKey="totalEnergy" fill="hsl(var(--foreground))" name="Total Energy (Wh)" />
-            <Bar dataKey="co2" fill="hsl(var(--danger))" name="CO2 Emissions (kg)" />
+            {selectedMetrics.map(metric => (
+              <Bar 
+                key={metric.key} 
+                dataKey={metric.key} 
+                fill={metric.color} 
+                name={metric.label}
+              >
+                <LabelList dataKey={metric.key} position="top" formatter={(v: number) => v.toFixed(1)} />
+              </Bar>
+            ))}
           </BarChart>
         </ResponsiveContainer>
       </CardContent>
