@@ -19,7 +19,7 @@ import { CompanyComparisonChart } from '@/components/dashboard/CompanyComparison
 import { getPerformanceMetrics } from '@/data/laptopData';
 import { DeviceData, sampleDeviceData } from '@/data/laptopData';
 
-export const CompanyComparisonChart = () => {
+export const Dashboard = () => {
   const [deviceData, setDeviceData] = useState<DeviceData[]>(sampleDeviceData);
 
   const metrics = getPerformanceMetrics(deviceData);
