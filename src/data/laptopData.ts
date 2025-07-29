@@ -71,4 +71,10 @@ export const getManufacturerStats = (data: DeviceData[]) => {
     percentage: Math.round((count / data.length) * 100)
   }));
 };
+export const getDeviceStatus = (device: DeviceData): 'excellent' | 'good' | 'warning' | 'critical' => {
+  if (device.batteryHealth >= 90 && device.totalEnergyConsumption <= 20) return 'excellent';
+  if (device.batteryHealth >= 70 && device.totalEnergyConsumption <= 40) return 'good';
+  if (device.batteryHealth >= 50 && device.totalEnergyConsumption <= 60) return 'warning';
+  return 'critical';
+};
 
