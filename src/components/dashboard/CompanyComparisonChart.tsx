@@ -15,7 +15,7 @@ import { PerformanceChart } from './PerformanceChart';
 import { BrandDistribution } from './BrandDistribution';
 import { DeviceTable } from './DeviceTable';
 import { EnergyBarChart } from '@/components/dashboard/EnergyAnalysis';
-import CompanyComparisonChart from '@/components/dashboard/CompanyComparisonChart';
+import { CompanyComparisonChart } from '@/components/dashboard/CompanyComparisonChart';
 import { getPerformanceMetrics } from '@/data/laptopData';
 import { DeviceData, sampleDeviceData } from '@/data/laptopData';
 
