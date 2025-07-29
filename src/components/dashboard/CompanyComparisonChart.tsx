@@ -1,21 +1,21 @@
 import { useState } from 'react';
-import {
-  Monitor,
-  Battery,
-  Leaf,
-  AlertTriangle,
+import { 
+  Monitor, 
+  Battery, 
+  Leaf, 
+  AlertTriangle, 
   TrendingUp,
   Zap,
   Server,
   Factory,
-  BarChart3
+  BarChart
 } from 'lucide-react';
 import { MetricCard } from './MetricCard';
 import { PerformanceChart } from './PerformanceChart';
 import { BrandDistribution } from './BrandDistribution';
 import { DeviceTable } from './DeviceTable';
 import { EnergyBarChart } from '@/components/dashboard/EnergyAnalysis';
-import { CompanyComparisonChart } from '@/components/dashboard/CompanyComparisonChart';
+import CompanyComparisonChart from '@/components/dashboard/CompanyComparisonChart';
 import { getPerformanceMetrics } from '@/data/laptopData';
 import { DeviceData, sampleDeviceData } from '@/data/laptopData';
 
@@ -136,10 +136,10 @@ export const Dashboard = () => {
           </div>
         </div>
 
-        {/* Company Comparison Chart */}
+        {/* Comparison Chart */}
         <div>
           <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2">
-            <BarChart3 className="h-6 w-6" />
+            <BarChart className="h-6 w-6" />
             Company Comparison
           </h2>
           <CompanyComparisonChart data={deviceData} />
