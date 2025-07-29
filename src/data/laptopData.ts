@@ -77,4 +77,45 @@ export const getDeviceStatus = (device: DeviceData): 'excellent' | 'good' | 'war
   if (device.batteryHealth >= 50 && device.totalEnergyConsumption <= 60) return 'warning';
   return 'critical';
 };
+export const getPerformanceMetrics = (data: DeviceData[]) => {
+  if (!data || data.length === 0) return {
+    totalDevices: 0,
+    avgBatteryHealth: 0,
+    avgCO2Emission: 0,
+    avgEnergyConsumption: 0,
+    criticalCount: 0,
+    excellentCount: 0,
+    healthyPercentage: 0
+  };
+
+  const totalDevices = data.length;
+  const avgBatteryHealth = Math.round(
+    data.reduce((sum, device) => sum + (device?.batteryHealth || 0), 0) / totalDevices
+  );
+  const avgCO2Emission = Number(
+    (data.reduce((sum, device) => sum + (device?.totalCO2Emitted || 0), 0) / totalDevices).toFixed(6)
+  );
+  const avgEnergyConsumption = Number(
+    (data.reduce((sum, device) => sum + (device?.totalEnergyConsumption || 0), 0) / totalDevices).toFixed(2)
+  );
+
+  const devicesWithStatus = data.map(device => ({
+    ...device,
+    status: getDeviceStatus(device)
+  }));
+
+  const criticalCount = devicesWithStatus.filter(device => device.status === 'critical').length;
+  const excellentCount = devicesWithStatus.filter(device => device.status === 'excellent').length;
+  const goodCount = devicesWithStatus.filter(device => device.status === 'good').length;
+
+  return {
+    totalDevices,
+    avgBatteryHealth,
+    avgCO2Emission,
+    avgEnergyConsumption,
+    criticalCount,
+    excellentCount,
+    healthyPercentage: Math.round(((excellentCount + goodCount) / totalDevices) * 100)
+  };
+};
 
