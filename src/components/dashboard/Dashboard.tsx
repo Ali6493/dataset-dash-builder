@@ -16,11 +16,16 @@ import { DeviceTable } from './DeviceTable';
 import { EnergyBarChart } from '@/components/dashboard/EnergyAnalysis';
 import { CompanyComparisonChart } from '@/components/dashboard/CompanyComparisonChart';
 import { getPerformanceMetrics } from '@/data/laptopData';
-import { DeviceData, sampleDeviceData } from '@/data/laptopData';
+import { DeviceData, loadDeviceData } from '@/data/laptopData';
+import { useEffect } from 'react';
 
 export const Dashboard = () => {
-  const [deviceData, setDeviceData] = useState<DeviceData[]>(sampleDeviceData);
+  const [deviceData, setDeviceData] = useState<DeviceData[]>([]);
   
+  useEffect(() => {
+    loadDeviceData().then(setDeviceData);
+  }, []);
+    
   const metrics = getPerformanceMetrics(deviceData);
 
   return (
