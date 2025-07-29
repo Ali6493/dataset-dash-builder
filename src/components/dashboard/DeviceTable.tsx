@@ -13,7 +13,7 @@ import {
 } from '@/components/ui/table';
 import { Select, SelectTrigger, SelectContent, SelectItem } from '@/components/ui/select';
 import { Search, Filter, ArrowUpDown, ChevronDown, ChevronUp } from 'lucide-react';
-import { DeviceData, getDeviceStatus } from '@/data/laptopData';
+import { getDeviceStatus } from '@/data/laptopData';
 import { cn } from '@/lib/utils';
 
 type SortField = keyof DeviceData;
