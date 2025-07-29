@@ -6,7 +6,6 @@ import {
   XAxis,
   YAxis,
   CartesianGrid,
-  Tooltip,
   Legend,
   LabelList,
 } from 'recharts';
@@ -35,11 +34,11 @@ export const CompanyComparisonChart = ({ data }: ComparisonChartProps) => {
     return {
       name: company,
       batteryHealth: avg('batteryHealth'),
+      totalEnergy: avg('totalEnergyConsumption'),
       cpuEnergy: avg('cpuEnergyConsumption'),
       diskEnergy: avg('diskEnergyConsumption'),
       displayEnergy: avg('displayEnergyConsumption'),
       networkEnergy: avg('networkEnergyConsumption'),
-      totalEnergy: avg('totalEnergyConsumption'),
       co2: avg('totalCO2Emitted'),
     };
   };
@@ -48,20 +47,20 @@ export const CompanyComparisonChart = ({ data }: ComparisonChartProps) => {
     .filter(Boolean)
     .map(company => aggregateCompanyData(company));
 
-    const metrics = [
+  const metrics = [
     { key: 'batteryHealth', label: 'Battery Health (%)', color: 'hsl(var(--success))' },
+    { key: 'totalEnergy', label: 'Total Energy (Wh)', color: 'hsl(var(--foreground))' },
     { key: 'cpuEnergy', label: 'CPU Energy (Wh)', color: 'hsl(var(--primary))' },
     { key: 'diskEnergy', label: 'Disk Energy (Wh)', color: 'hsl(var(--warning))' },
     { key: 'displayEnergy', label: 'Display Energy (Wh)', color: 'hsl(var(--accent))' },
-    { key: 'networkEnergy', label: 'Network Energy (Wh)', color: 'hsl(var(--muted))' },
-    { key: 'totalEnergy', label: 'Total Energy (Wh)', color: 'hsl(var(--foreground))' },
+    { key: 'networkEnergy', label: 'Network Energy (Wh)', color: '#8884d8' }, // Custom purple
     { key: 'co2', label: 'CO2 Emissions (kg)', color: 'hsl(var(--danger))' },
   ];
 
-  const selectedMetrics = selectedMetric === 'all' 
-    ? metrics 
+  const selectedMetrics = selectedMetric === 'all'
+    ? metrics
     : metrics.filter(m => m.key === selectedMetric);
-  
+
   return (
     <Card className="col-span-2">
       <CardHeader>
@@ -86,7 +85,11 @@ export const CompanyComparisonChart = ({ data }: ComparisonChartProps) => {
             </SelectContent>
           </Select>
           <Select onValueChange={setSelectedMetric} value={selectedMetric}>
-            <SelectTrigger>{selectedMetric === 'all' ? 'All Metrics' : metrics.find(m => m.key === selectedMetric)?.label}</SelectTrigger>
+            <SelectTrigger>
+              {selectedMetric === 'all'
+                ? 'All Metrics'
+                : metrics.find(m => m.key === selectedMetric)?.label}
+            </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Metrics</SelectItem>
               {metrics.map(m => (
@@ -104,13 +107,13 @@ export const CompanyComparisonChart = ({ data }: ComparisonChartProps) => {
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="name" />
             <YAxis />
-            <Tooltip />
+            {/* Tooltip removed */}
             <Legend />
             {selectedMetrics.map(metric => (
-              <Bar 
-                key={metric.key} 
-                dataKey={metric.key} 
-                fill={metric.color} 
+              <Bar
+                key={metric.key}
+                dataKey={metric.key}
+                fill={metric.color}
                 name={metric.label}
               >
                 <LabelList dataKey={metric.key} position="top" formatter={(v: number) => v.toFixed(1)} />
