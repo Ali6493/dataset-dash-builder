@@ -70,7 +70,7 @@ export const CompanyComparisonChart = ({ data }: ComparisonChartProps) => {
       <CardContent>
         <div className="flex flex-col md:flex-row gap-4 mb-6">
           <Select onValueChange={setCompany1} value={company1}>
-            <SelectTrigger>Company 1</SelectTrigger>
+            <SelectTrigger>{company1 || 'Select Company 1'}</SelectTrigger>
             <SelectContent>
               {uniqueManufacturers.map(m => (
                 <SelectItem key={m} value={m}>{m}</SelectItem>
