@@ -7,8 +7,7 @@ import {
   TrendingUp,
   Zap,
   Server,
-  Factory,
-  BarChart
+  Factory
 } from 'lucide-react';
 import { MetricCard } from './MetricCard';
 import { PerformanceChart } from './PerformanceChart';
@@ -21,7 +20,7 @@ import { DeviceData, sampleDeviceData } from '@/data/laptopData';
 
 export const Dashboard = () => {
   const [deviceData, setDeviceData] = useState<DeviceData[]>(sampleDeviceData);
-
+  
   const metrics = getPerformanceMetrics(deviceData);
 
   return (
@@ -99,50 +98,51 @@ export const Dashboard = () => {
             </h2>
             <EnergyBarChart data={deviceData} />
           </div>
-          <div className="space-y-6">
-            <div>
-              <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2">
-                <Server className="h-6 w-6" />
-                Fleet Health Overview
-              </h2>
-              <div className="grid grid-cols-2 gap-4">
-                <MetricCard
-                  title="Healthy Systems"
-                  value={`${metrics.healthyPercentage}%`}
-                  icon={<TrendingUp className="h-5 w-5" />}
-                  description="Good or excellent"
-                />
-                <MetricCard
-                  title="Critical Alerts"
-                  value={metrics.criticalCount.toString()}
-                  icon={<AlertTriangle className="h-5 w-5" />}
-                  description="Require attention"
-                  variant="destructive"
-                />
-                <MetricCard
-                  title="Excellent Devices"
-                  value={metrics.excellentCount.toString()}
-                  icon={<Battery className="h-5 w-5" />}
-                  description="Top performers"
-                />
-                <MetricCard
-                  title="Total Energy"
-                  value={`${deviceData.reduce((sum, d) => sum + d.totalEnergyConsumption, 0).toFixed(1)} Wh`}
-                  icon={<Zap className="h-5 w-5" />}
-                  description="Fleet consumption"
-                />
-              </div>
-            </div>
+
+          <div>
+            <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2">
+              <Factory className="h-6 w-6" />
+              Company Comparison
+            </h2>
+            <CompanyComparisonChart data={deviceData} />
           </div>
         </div>
 
-        {/* Comparison Chart */}
-        <div>
-          <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2">
-            <BarChart className="h-6 w-6" />
-            Company Comparison
-          </h2>
-          <CompanyComparisonChart data={deviceData} />
+        {/* Fleet Health */}
+        <div className="space-y-6">
+          <div>
+            <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2">
+              <Server className="h-6 w-6" />
+              Fleet Health Overview
+            </h2>
+            <div className="grid grid-cols-2 gap-4">
+              <MetricCard
+                title="Healthy Systems"
+                value={`${metrics.healthyPercentage}%`}
+                icon={<TrendingUp className="h-5 w-5" />}
+                description="Good or excellent"
+              />
+              <MetricCard
+                title="Critical Alerts"
+                value={metrics.criticalCount.toString()}
+                icon={<AlertTriangle className="h-5 w-5" />}
+                description="Require attention"
+                variant="destructive"
+              />
+              <MetricCard
+                title="Excellent Devices"
+                value={metrics.excellentCount.toString()}
+                icon={<Battery className="h-5 w-5" />}
+                description="Top performers"
+              />
+              <MetricCard
+                title="Total Energy"
+                value={`${deviceData.reduce((sum, d) => sum + d.totalEnergyConsumption, 0).toFixed(1)} Wh`}
+                icon={<Zap className="h-5 w-5" />}
+                description="Fleet consumption"
+              />
+            </div>
+          </div>
         </div>
 
         {/* Detailed Table */}
