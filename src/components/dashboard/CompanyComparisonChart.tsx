@@ -106,47 +106,50 @@ export const CompanyComparisonChart = ({ data }: ComparisonChartProps) => {
             </SelectContent>
           </Select>
         </div>
-    <ResponsiveContainer width="100%" height={500}>
-  <BarChart
-    data={chartData}
-    layout="vertical"
-    margin={{ top: 20, right: 30, left: 160, bottom: 20 }} // Left margin widened
-    barCategoryGap={20}
-    barGap={6}
-  >
-    <CartesianGrid strokeDasharray="3 3" />
-    <XAxis type="number" />
-    <YAxis
-      type="category"
-      dataKey="metric"
-      tick={{ fontSize: 14 }}
-      interval={0}
-      width={150} // Makes sure long labels fit
-    />
-    <Legend />
-    {company1 && (
-      <Bar dataKey={company1} fill="hsl(var(--success))">
-        <LabelList
-          dataKey={company1}
-          position="right"
-          formatter={(v: number) => v.toFixed(1)}
-        />
-      </Bar>
-    )}
-    {company2 && (
-      <Bar dataKey={company2} fill="hsl(var(--primary))">
-        <LabelList
-          dataKey={company2}
-          position="right"
-          formatter={(v: number) => v.toFixed(1)}
-        />
-      </Bar>
-    )}
-  </BarChart>
-</ResponsiveContainer>
 
-    
-
+        <ResponsiveContainer width="100%" height={400}>
+          {selectedMetric === 'all' ? (
+            <BarChart
+              data={chartData}
+              layout="vertical"
+              margin={{ top: 20, right: 30, left: 100, bottom: 5 }}
+              barCategoryGap={10}
+            >
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis type="number" />
+              <YAxis dataKey="metric" type="category" />
+              <Legend />
+              {company1 && (
+                <Bar dataKey={company1} fill="hsl(var(--success))">
+                  <LabelList dataKey={company1} position="right" formatter={(v: number) => v.toFixed(1)} />
+                </Bar>
+              )}
+              {company2 && (
+                <Bar dataKey={company2} fill="hsl(var(--primary))">
+                  <LabelList dataKey={company2} position="right" formatter={(v: number) => v.toFixed(1)} />
+                </Bar>
+              )}
+            </BarChart>
+          ) : (
+            <BarChart
+              data={chartData}
+              margin={{ top: 20, right: 30, left: 20, bottom: 30 }}
+              barCategoryGap={30}
+            >
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="name" />
+              <YAxis />
+              <Legend />
+              <Bar
+                dataKey="value"
+                fill="hsl(var(--success))"
+                name={selectedMetrics[0].label}
+              >
+                <LabelList dataKey="value" position="top" formatter={(v: number) => v.toFixed(1)} />
+              </Bar>
+            </BarChart>
+          )}
+        </ResponsiveContainer>
       </CardContent>
     </Card>
   );
