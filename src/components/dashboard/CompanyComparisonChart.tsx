@@ -107,49 +107,51 @@ export const CompanyComparisonChart = ({ data }: ComparisonChartProps) => {
           </Select>
         </div>
 
-        <ResponsiveContainer width="100%" height={400}>
-          {selectedMetric === 'all' ? (
-            <BarChart
-              data={chartData}
-              layout="vertical"
-              margin={{ top: 20, right: 30, left: 100, bottom: 5 }}
-              barCategoryGap={10}
-            >
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis type="number" />
-              <YAxis dataKey="metric" type="category" />
-              <Legend />
-              {company1 && (
-                <Bar dataKey={company1} fill="hsl(var(--success))">
-                  <LabelList dataKey={company1} position="right" formatter={(v: number) => v.toFixed(1)} />
-                </Bar>
-              )}
-              {company2 && (
-                <Bar dataKey={company2} fill="hsl(var(--primary))">
-                  <LabelList dataKey={company2} position="right" formatter={(v: number) => v.toFixed(1)} />
-                </Bar>
-              )}
-            </BarChart>
-          ) : (
-            <BarChart
-              data={chartData}
-              margin={{ top: 20, right: 30, left: 20, bottom: 30 }}
-              barCategoryGap={30}
-            >
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" />
-              <YAxis />
-              <Legend />
-              <Bar
-                dataKey="value"
-                fill="hsl(var(--success))"
-                name={selectedMetrics[0].label}
-              >
-                <LabelList dataKey="value" position="top" formatter={(v: number) => v.toFixed(1)} />
-              </Bar>
-            </BarChart>
-          )}
-        </ResponsiveContainer>
+<ResponsiveContainer width="100%" height={400}>
+  {selectedMetric === 'all' ? (
+    <BarChart
+      data={chartData}
+      layout="vertical"
+      margin={{ top: 20, right: 30, left: 150, bottom: 5 }} // wider left margin
+      barCategoryGap={20}  // more space between categories
+      barGap={6}           // more gap between company bars in the same group
+    >
+      <CartesianGrid strokeDasharray="3 3" />
+      <XAxis type="number" />
+      <YAxis dataKey="metric" type="category" />
+      <Legend />
+      {company1 && (
+        <Bar dataKey={company1} fill="hsl(var(--success))">
+          <LabelList dataKey={company1} position="right" formatter={(v: number) => v.toFixed(1)} />
+        </Bar>
+      )}
+      {company2 && (
+        <Bar dataKey={company2} fill="hsl(var(--primary))">
+          <LabelList dataKey={company2} position="right" formatter={(v: number) => v.toFixed(1)} />
+        </Bar>
+      )}
+    </BarChart>
+  ) : (
+    <BarChart
+      data={chartData}
+      margin={{ top: 20, right: 30, left: 20, bottom: 30 }}
+      barCategoryGap={30}
+    >
+      <CartesianGrid strokeDasharray="3 3" />
+      <XAxis dataKey="name" />
+      <YAxis />
+      <Legend />
+      <Bar
+        dataKey="value"
+        fill="hsl(var(--success))"
+        name={selectedMetrics[0].label}
+      >
+        <LabelList dataKey="value" position="top" formatter={(v: number) => v.toFixed(1)} />
+      </Bar>
+    </BarChart>
+  )}
+</ResponsiveContainer>
+
       </CardContent>
     </Card>
   );
