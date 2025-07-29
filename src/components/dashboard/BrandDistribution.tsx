@@ -1,6 +1,6 @@
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Chart } from "react-google-charts";
-import { getManufacturerStats, DeviceData } from "@/data/laptopData";
+import { getManufacturerStats } from '@/data/laptopData';
 
 interface BrandDistributionProps {
   data: DeviceData[];
