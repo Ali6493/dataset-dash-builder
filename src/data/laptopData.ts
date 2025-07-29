@@ -57,3 +57,18 @@ export const loadDeviceData = async (): Promise<DeviceData[]> => {
     status: getDeviceStatus(item as DeviceData),
   }));
 };
+export const getManufacturerStats = (data: DeviceData[]) => {
+  if (!data || data.length === 0) return [];
+
+  const manufacturerCount = data.reduce((acc, device) => {
+    acc[device.deviceManufacturer] = (acc[device.deviceManufacturer] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
+
+  return Object.entries(manufacturerCount).map(([manufacturer, count]) => ({
+    manufacturer,
+    count,
+    percentage: Math.round((count / data.length) * 100)
+  }));
+};
+
