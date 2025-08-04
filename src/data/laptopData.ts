@@ -80,12 +80,40 @@ export const getManufacturerStats = (data: DeviceData[]) => {
   }));
 };
 
-export const getDeviceStatus = (device: DeviceData): 'excellent' | 'good' | 'warning' | 'critical' => {
-  if (device.batteryHealth >= 90 && device.totalEnergyConsumption <= 20) return 'excellent';
-  if (device.batteryHealth >= 70 && device.totalEnergyConsumption <= 40) return 'good';
-  if (device.batteryHealth >= 50 && device.totalEnergyConsumption <= 60) return 'warning';
-  return 'critical';
+export const getDeviceStatus = (
+  device: DeviceData
+): 'excellent' | 'good' | 'warning' | 'critical' => {
+  let tier: 'high' | 'mid' | 'low';
+
+  if (device.ram >= 64) {
+    tier = 'high';
+  } else if (device.ram >= 32) {
+    tier = 'mid';
+  } else {
+    tier = 'low';
+  }
+
+  switch (tier) {
+    case 'high':
+      if (device.batteryHealth >= 90 && device.totalEnergyConsumption <= 30) return 'excellent';
+      if (device.batteryHealth >= 75 && device.totalEnergyConsumption <= 49.5) return 'good';
+      if (device.batteryHealth >= 60 && device.totalEnergyConsumption <= 53) return 'warning';
+      return 'critical';
+
+    case 'mid':
+      if (device.batteryHealth >= 85 && device.totalEnergyConsumption <= 25) return 'excellent';
+      if (device.batteryHealth >= 70 && device.totalEnergyConsumption <= 45) return 'good';
+      if (device.batteryHealth >= 55 && device.totalEnergyConsumption <= 49.5) return 'warning';
+      return 'critical';
+
+    case 'low':
+      if (device.batteryHealth >= 80 && device.totalEnergyConsumption <= 20) return 'excellent';
+      if (device.batteryHealth >= 65 && device.totalEnergyConsumption <= 40) return 'good';
+      if (device.batteryHealth >= 50 && device.totalEnergyConsumption <= 45.67) return 'warning';
+      return 'critical';
+  }
 };
+
 
 export const getPerformanceMetrics = (data: DeviceData[]) => {
   if (!data || data.length === 0) return {
